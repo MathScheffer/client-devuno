@@ -8,12 +8,22 @@ a {
 
 /* Homepage */
 .Homepage {
-  background-image: url('./assets/Landing-Page.gif');
-  background-size: cover;
-  margin: 0;
+  background-color: #ffffff;
+  background-size: 100%;
   height: 100vh;
+  padding-top: 2%;
 }
 
+.homepage-black{
+  background-color: #000;
+  width: 90%;
+  height: 90%;
+  border-radius: 5%;
+  margin: 0 auto;
+  padding-top: 2%;
+
+
+}
 .homepage-menu {
   position: relative;
   top: 120px;
@@ -21,9 +31,29 @@ a {
 
 .homepage-form {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   margin-top: 50px;
+  align-items: center;
 }
+
+.input-for-code {
+  width: 150px; 
+  background-color: transparent;
+  margin-bottom: 5%;
+  border-radius: 8px;
+  padding: 10px;
+  border: 4px solid #99bd4c; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+#input-code::placeholder{
+  color: #fff; 
+}
+
 
 .homepage-form>h1 {
   margin: 0 30px;
@@ -32,13 +62,10 @@ a {
 .homepage-join {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
-.homepage-join>input {
-  font-size: 15px;
-  width: 150px;
-  line-height: 1.5em;
-}
+
 
 /* Game.js parent div */
 .Game {
@@ -218,12 +245,63 @@ a {
   box-shadow: 0 4px 0 #ae2725, 0 6px 1px 1px rgba(0,0,0,.3), 0 8px 0 5px #831614, 0 10px 0 5px #a33634, 0 13px 0 5px #631716, 0 13px 1px 6px rgba(0,0,0,.3);
 }
 
-.game-button.green {
-    background: repeating-linear-gradient( 45deg, #54d440, #54d440 5px, #52cc3f 5px, #52cc3f 10px);
-    box-shadow: 0 6px 0 #348628, 0 8px 1px 1px rgba(0,0,0,.3), 0 10px 0 5px #2a6d20, 0 12px 0 5px #39822e, 0 15px 0 5px #1d4c16, 0 15px 1px 6px rgba(0,0,0,.3);
-    border-bottom: 3px solid rgba(40, 117, 29, 0.5);
-    text-shadow: 2px 2px 1px #348628, -2px 2px 1px #348628, 2px -2px 1px #348628, -2px -2px 1px #348628, 0px 2px 1px #348628, 0px -2px 1px #348628, 0px 4px 1px #1d4c16, 2px 4px 1px #1d4c16, -2px 4px 1px #1d4c16;
+.game-button-green {
+    background: transparent;
+    border: 4px solid #99bd4c; 
+    border-radius: 8px; 
+    padding: 4%;
+    margin-top: 2%;
+    cursor: pointer; 
+    width: 200px; 
 }
+
+.homepage-logo{
+  width: 250px;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.game-button-green p {
+  color: #fff;
+  font-size: 20px;
+  font-style: bold;
+}
+
+.game-button-orange {
+  background: transparent;
+  border: 4px solid #be3d2b; 
+  border-radius: 8px; 
+  padding: 4%;
+  margin-top: 2%;
+  cursor: pointer;  
+  width: 200px;
+
+}
+
+.game-button-orange p {
+  color: #fff;
+  font-size: 20px;
+  font-style: bold;
+}
+
+.game-button-orange:hover{
+  background-color: #fff;
+  border: #000;
+}
+
+.game-button-orange p:hover{
+  color: #000;
+}
+
+.game-button-green:hover{
+  background-color: #fff;
+  border: #000;
+}
+
+.game-button-green p:hover{
+  color: #000;
+}
+
 
 .game-button.green:hover {
   top:2px;
@@ -385,3 +463,4 @@ a {
 .msg-receive:hover, .msg-send:hover{
 	opacity: .9;
 }
+

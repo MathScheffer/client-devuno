@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Carter+One');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;600&display=swap');
 
 * {
   margin: 0;
@@ -7,7 +8,7 @@
 
 body {
   margin: 0;
-  font-family: 'Carter One', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   color: white;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

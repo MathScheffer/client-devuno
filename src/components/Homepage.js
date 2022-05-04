@@ -1,24 +1,29 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import randomCodeGenerator from '../utils/randomCodeGenerator'
+import devunoWhite from '../assets/devuno/devuno_logo_white.png'
 
 const Homepage = () => {
     const [roomCode, setRoomCode] = useState('')
 
     return (
         <div className='Homepage'>
+            <div className='homepage-black'> 
             <div className='homepage-menu'>
-                <img src={require('../assets/logo.png').default} width='200px' />
-                <div className='homepage-form'>
+           
+                <div className='homepage-form'>     
+                <img src={devunoWhite} className='homepage-logo' alt='logotipo'/>
                     <div className='homepage-join'>
-                        <input type='text' placeholder='Game Code' onChange={(event) => setRoomCode(event.target.value)} />
-                        <Link to={`/play?roomCode=${roomCode}`}><button className="game-button green">JOIN GAME</button></Link>
+                        <input type='text' placeholder='GAME CODE' id='input-code' className='input-for-code' onChange={(event) => setRoomCode(event.target.value)} />
+                        <Link to={`/play?roomCode=${roomCode}`}><button className="game-button-green"> <p> JOIN GAME </p> </button></Link>
                     </div>
-                    <h1>OR</h1>
+                    <h1 className=''>OR</h1>
                     <div className='homepage-create'>
-                        <Link to={`/play?roomCode=${randomCodeGenerator(5)}`}><button className="game-button orange">CREATE GAME</button></Link>
+                        <Link to={`/play?roomCode=${randomCodeGenerator(5)}`}><button className="game-button-orange"> 
+                        <p> CREATE GAME </p> </button></Link>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     )
