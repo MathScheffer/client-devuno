@@ -59,7 +59,7 @@ const visaoPlayer = ({
                                 currentNumber: numberOfPlayedCard,
                                 drawCardPile: [...copiedDrawCardPileArray]
                             }) */
-                            forgotUno('Player 1')
+                            forgotUno('Player 1',played_card,colorOfPlayedCard,numberOfPlayedCard)
                         }
                         else {
                             !isSoundMuted && playShufflingSound()
@@ -75,7 +75,7 @@ const visaoPlayer = ({
                             }) */
                             const updatedPlayer1Deck = [...player1Deck.slice(0, removeIndex), ...player1Deck.slice(removeIndex + 1)]
 
-                            socketEmitUpdateGameState('Player 1', 'Player 2',
+                            socketEmitUpdateGameState('Player 1',
                                 played_card,updatedPlayer1Deck, 
                                 colorOfPlayedCard,numberOfPlayedCard,)
                         }
@@ -109,7 +109,7 @@ const visaoPlayer = ({
                                 drawCardPile: [...copiedDrawCardPileArray]
                             }) */
 
-                            forgotUno("player2")
+                            forgotUno("player2",played_card,colorOfPlayedCard,numberOfPlayedCard)
                         }
                         else {
                             !isSoundMuted && playShufflingSound()
@@ -124,7 +124,10 @@ const visaoPlayer = ({
                                 currentNumber: numberOfPlayedCard
                             }) */
                             const updatedPlayer2Deck = [...player2Deck.slice(0, removeIndex), ...player2Deck.slice(removeIndex + 1)];
-                            socketEmitUpdateGameState('Player 2','Player 1', played_card, updatedPlayer2Deck,colorOfPlayedCard, numberOfPlayedCard)
+                            socketEmitUpdateGameState('Player 2',
+                             played_card, updatedPlayer2Deck,colorOfPlayedCard,
+                              numberOfPlayedCard)
+                             
                         }
                     }
                 }
@@ -141,7 +144,7 @@ const visaoPlayer = ({
 
                         //TODO
                         if(player1Deck.length===2 && !isUnoButtonPressed) {
-                            alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
+  /*                           alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
                             //make a copy of drawCardPile array
                             const copiedDrawCardPileArray = [...drawCardPile]
                             //pull out last two elements from it
@@ -161,12 +164,14 @@ const visaoPlayer = ({
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: numberOfPlayedCard,
                                 drawCardPile: [...copiedDrawCardPileArray]
-                            })
+                            }) */
+
+                            forgotUno("Player 1",played_card,colorOfPlayedCard,numberOfPlayedCard)
                         }
                         else {
                             !isSoundMuted && playShufflingSound()
                             //send new state to server
-                            socket.emit('updateGameState', {
+/*                             socket.emit('updateGameState', {
                                 gameOver: checkGameOver(player1Deck),
                                 winner: checkWinner(player1Deck, 'Player 1'),
                                 turn: 'Player 2',
@@ -174,7 +179,10 @@ const visaoPlayer = ({
                                 player1Deck: [...player1Deck.slice(0, removeIndex), ...player1Deck.slice(removeIndex + 1)],
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: numberOfPlayedCard
-                            })
+                            }) */
+                            const updatedPlayer1Deck = [...player1Deck.slice(0, removeIndex), ...player1Deck.slice(removeIndex + 1)]
+                            socketEmitUpdateGameState("Player 1",played_card,
+                                updatedPlayer1Deck,colorOfPlayedCard,numberOfPlayedCard)
                         }
                     }
                     else {
@@ -184,7 +192,7 @@ const visaoPlayer = ({
                         //if two cards remaining check if player pressed UNO button
                         //if not pressed add 2 cards as penalty
                         if(player2Deck.length===2 && !isUnoButtonPressed) {
-                            alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
+/*                             alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
                             //make a copy of drawCardPile array
                             const copiedDrawCardPileArray = [...drawCardPile]
                             //pull out last two elements from it
@@ -204,12 +212,14 @@ const visaoPlayer = ({
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: numberOfPlayedCard,
                                 drawCardPile: [...copiedDrawCardPileArray]
-                            })
+                            }) */
+
+                            forgotUno("Player 2",played_card,colorOfPlayedCard,numberOfPlayedCard)
                         }
                         else {
                             !isSoundMuted && playShufflingSound()
                             //send new state to server
-                            socket.emit('updateGameState', {
+/*                             socket.emit('updateGameState', {
                                 gameOver: checkGameOver(player2Deck),
                                 winner: checkWinner(player2Deck, 'Player 2'),
                                 turn: 'Player 1',
@@ -217,7 +227,10 @@ const visaoPlayer = ({
                                 player2Deck: [...player2Deck.slice(0, removeIndex), ...player2Deck.slice(removeIndex + 1)],
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: numberOfPlayedCard
-                            })
+                            }) */
+                            const updatedPlayer2Deck = [...player2Deck.slice(0, removeIndex), ...player2Deck.slice(removeIndex + 1)]
+                            socketEmitUpdateGameState("Player 2",played_card
+                                ,updatedPlayer2Deck,colorOfPlayedCard,numberOfPlayedCard)
                         }
                     }
                 }
@@ -242,7 +255,7 @@ const visaoPlayer = ({
                         //if two cards remaining check if player pressed UNO button
                         //if not pressed add 2 cards as penalty
                         if(player1Deck.length===2 && !isUnoButtonPressed) {
-                            alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
+/*                             alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
                             //make a copy of drawCardPile array
                             const copiedDrawCardPileArray = [...drawCardPile]
                             //pull out last two elements from it
@@ -262,7 +275,9 @@ const visaoPlayer = ({
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: 404,
                                 drawCardPile: [...copiedDrawCardPileArray]
-                            })
+                            }) */
+
+                            forgotUno("Player 1",played_card,colorOfPlayedCard,404)
                         }
                         else {
                             !isSoundMuted && playSkipCardSound()
@@ -276,6 +291,8 @@ const visaoPlayer = ({
                                 currentNumber: 404
                             })
                         }
+
+                        socketEmitUpdateGameState()
                     }
                     else {
                         //remove the played card from player2's deck and add it to playedCardsPile (immutably)
@@ -845,9 +862,8 @@ const visaoPlayer = ({
         }
     }
 
-    const forgotUno = (player) => {
+    const forgotUno = (player, played_card, colorOfPlayedCard,numberOfPlayedCard) => {
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
-        const playerTun = player == 'Player 1' ? 'Player 2' : 'Player 1';
 
         alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
         //make a copy of drawCardPile array
@@ -860,19 +876,21 @@ const visaoPlayer = ({
         updatedPlayerDeck.push(drawCard2)
         !isSoundMuted && playShufflingSound()
 
-        socketEmitUpdateGameState(player, playerTun,
-        played_card,updatedPlayer1Deck, 
+        socketEmitUpdateGameState(player,
+        played_card,updatedPlayerDeck, 
          colorOfPlayedCard,numberOfPlayedCard,copiedDrawCardPileArray  )
     }
 
     const socketEmitUpdateGameState = (
                                         winner,
-                                        turn,
                                         played_card,
                                         updatedPlayerDeck,
                                         colorOfPlayedCard,
                                         numberOfPlayedCard,
                                         modifiedDrawCardPile  ) => {
+
+        const turn = winner == "Player 1" ? "Player 2" : "Player 1";
+
         const obj = winner == 'Player 1' ? {
             gameOver: checkGameOver(player1Deck),
             winner: checkWinner(player1Deck, winner),
@@ -891,8 +909,6 @@ const visaoPlayer = ({
             currentColor: colorOfPlayedCard,
             currentNumber: numberOfPlayedCard,
             drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile
-
-
         }
 
         socket.emit('updateGameState', obj)
