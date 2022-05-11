@@ -73,6 +73,7 @@ const visaoPlayer = ({
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: numberOfPlayedCard
                             }) */
+                            const removeIndex = player1Deck.indexOf(played_card)
                             const updatedPlayer1Deck = [...player1Deck.slice(0, removeIndex), ...player1Deck.slice(removeIndex + 1)]
 
                             socketEmitUpdateGameState('Player 1', 'Player 2',
@@ -123,6 +124,7 @@ const visaoPlayer = ({
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: numberOfPlayedCard
                             }) */
+                            const removeIndex = player2Deck.indexOf(played_card)
                             const updatedPlayer2Deck = [...player2Deck.slice(0, removeIndex), ...player2Deck.slice(removeIndex + 1)];
                             socketEmitUpdateGameState('Player 2',
                             'Player 1',
@@ -304,7 +306,7 @@ const visaoPlayer = ({
                         //if two cards remaining check if player pressed UNO button
                         //if not pressed add 2 cards as penalty
                         if(player2Deck.length===2 && !isUnoButtonPressed) {
-                            alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
+/*                             alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
                             //make a copy of drawCardPile array
                             const copiedDrawCardPileArray = [...drawCardPile]
                             //pull out last two elements from it
@@ -323,7 +325,7 @@ const visaoPlayer = ({
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: 404,
                                 drawCardPile: [...copiedDrawCardPileArray]
-                            })
+                            }) */
 
 
                             forgotUno('Player 2','Player 2',played_card,colorOfPlayedCard,404)
@@ -339,7 +341,7 @@ const visaoPlayer = ({
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: 404
                             }) */
-
+                            const removeIndex = player2Deck.indexOf(played_card)
                             const updatedPlayer2Deck = [...player2Deck.slice(0, removeIndex), ...player2Deck.slice(removeIndex + 1)]
                             socketEmitUpdateGameState('Player 2','Player 2',played_card,
                                 updatedPlayer2Deck,colorOfPlayedCard,404)
@@ -391,6 +393,7 @@ const visaoPlayer = ({
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: 404
                             }) */
+                            const removeIndex = player1Deck.indexOf(played_card)
                             const updatedPlayer1Deck = [...player1Deck.slice(0, removeIndex), ...player1Deck.slice(removeIndex + 1)]
                             socketEmitUpdateGameState('Player 1','Player 1',played_card,
                                 updatedPlayer1Deck,colorOfPlayedCard,404)
@@ -427,7 +430,7 @@ const visaoPlayer = ({
                         }
                         else {
                             !isSoundMuted && playSkipCardSound()
-                            //send new state to server
+/*                             //send new state to server
                             socket.emit('updateGameState', {
                                 gameOver: checkGameOver(player2Deck),
                                 winner: checkWinner(player2Deck, 'Player 2'),
@@ -435,7 +438,8 @@ const visaoPlayer = ({
                                 player2Deck: [...player2Deck.slice(0, removeIndex), ...player2Deck.slice(removeIndex + 1)],
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: 404
-                            })
+                            }) */
+                            const removeIndex = player2Deck.indexOf(played_card)
                             const updatedPlayer2Deck = [...player2Deck.slice(0, removeIndex), ...player2Deck.slice(removeIndex + 1)]
                             socketEmitUpdateGameState('Player 2','Player 2',played_card,
                                 updatedPlayer2Deck,colorOfPlayedCard, 404)
@@ -884,16 +888,36 @@ const visaoPlayer = ({
             break;
         }
     }
+    const drag2 = (player,turn,played_card,colorOfPlayedCard,numberOfPlayedCard,opponent,isForgotUno=false) => {
+        const opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
 
-    const forgotUno = (player,turn, played_card, colorOfPlayedCard,numberOfPlayedCard) => {
+        const modifiedDeck = [...drawCardPile]
+
+        const opponentDrawCard1 = modifiedDeck.pop()
+        const opponentDrawCard2 = modifiedDeck.pop()
+
+        opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard1, opponentDrawCard2, ...opponentDeck.slice(opponentDeck.length)]
+
+        if(forgotUno){
+            forgotUno(player,turn,played_card,colorOfPlayedCard,numberOfPlayedCard,
+                opponentDeck,modifiedDeck)
+        }else{
+            socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
+                colorOfPlayedCard,numberOfPlayedCard,modifiedDeck,opponentDeck)
+        }
+    }
+    
+    const forgotUno = (player,turn, played_card, colorOfPlayedCard,numberOfPlayedCard, opponentsDeck=null, modifiedDeck=null) => {
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
+        const removeIndex = playerDeck.indexOf(played_card);
 
         alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
         //make a copy of drawCardPile array
-        const copiedDrawCardPileArray = [...drawCardPile]
+        const copiedDrawCardPileArray = modifiedDeck != null ? modifiedDeck : drawCardPile
         //pull out last two elements from it
         const drawCard1 = copiedDrawCardPileArray.pop()
         const drawCard2 = copiedDrawCardPileArray.pop()
+
         const updatedPlayerDeck = [...playerDeck.slice(0, removeIndex), ...playerDeck.slice(removeIndex + 1)]
         updatedPlayerDeck.push(drawCard1)
         updatedPlayerDeck.push(drawCard2)
@@ -902,9 +926,8 @@ const visaoPlayer = ({
          * !isSoundMuted && playShufflingSound()*/
 
         socketEmitUpdateGameState(player,
-            turn,
-        played_card,updatedPlayerDeck, 
-         colorOfPlayedCard,numberOfPlayedCard,copiedDrawCardPileArray  )
+            turn,played_card,updatedPlayerDeck, colorOfPlayedCard,numberOfPlayedCard,
+            copiedDrawCardPileArray, opponentsDeck)
     }
 
     const socketEmitUpdateGameState = (
@@ -915,20 +938,19 @@ const visaoPlayer = ({
                                         colorOfPlayedCard,
                                         numberOfPlayedCard,
                                         modifiedDrawCardPile,
-                                        modifiedPlayer1Deck = null,
-                                        modifiedPlayer2Deck = null  ) => {
+                                        opponentsDeck = null,) => {
 
         const obj;
         
         if(winner=='Player 1'){
-          obj =  modifiedPlayer1Deck !== null && modifiedPlayer2Deck !== null ? 
+          obj =  opponentsDeck !== null ? 
             {
                 gameOver: checkGameOver(player1Deck),
                 winner: checkWinner(player1Deck, winner),
                 turn: turn,
                 playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), played_card, ...playedCardsPile.slice(playedCardsPile.length)],
-                player1Deck: [...modifiedPlayer1Deck],
-                player2Deck:[...modifiedPlayer2Deck],
+                player1Deck: [...updatedPlayerDeck],
+                player2Deck:[...opponentsDeck],
                 currentColor: colorOfPlayedCard,
                 currentNumber: numberOfPlayedCard,
                 drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile  
@@ -943,13 +965,13 @@ const visaoPlayer = ({
                 drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile
             } 
         }else{
-            obj =  modifiedPlayer1Deck !== null && modifiedPlayer2Deck !== null ? {
+            obj =  opponentsDeck !== null ? {
                 gameOver: checkGameOver(player2Deck),
                 winner: checkWinner(player2Deck, winner),
                 turn: turn,
                 playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), played_card, ...playedCardsPile.slice(playedCardsPile.length)],
-                player1Deck: [...modifiedPlayer1Deck],
-                player2Deck: [...modifiedPlayer2Deck],
+                player1Deck: [...opponentsDeck],
+                player2Deck: [...updatedPlayerDeck],
                 currentColor: colorOfPlayedCard,
                 currentNumber: numberOfPlayedCard,
                 drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile
