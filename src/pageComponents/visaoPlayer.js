@@ -58,7 +58,7 @@ const visaoPlayer = ({
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: numberOfPlayedCard,
                                 drawCardPile: [...copiedDrawCardPileArray]
-                            }) */
+                            })
                             forgotUno('Player 1','Player 2',played_card,colorOfPlayedCard,numberOfPlayedCard)
                         }
                         else {
@@ -145,7 +145,6 @@ const visaoPlayer = ({
                         //if two cards remaining check if player pressed UNO button
                         //if not pressed add 2 cards as penalty
 
-                        //TODO
                         if(player1Deck.length===2 && !isUnoButtonPressed) {
   /*                           alert('Oops! You forgot to press UNO. You drew 2 cards as penalty.')
                             //make a copy of drawCardPile array
@@ -461,7 +460,7 @@ const visaoPlayer = ({
                     console.log('colors matched!')
                     //check who played the card and return new state accordingly
                     if(cardPlayedBy === 'Player 1') {
-                        //remove the played card from player1's deck and add it to playedCardsPile (immutably)
+                       /*  //remove the played card from player1's deck and add it to playedCardsPile (immutably)
                         //remove 2 new cards from drawCardPile and add them to player2's deck (immutably)
                         //then update currentColor and currentNumber - turn will remain same
                         const removeIndex = player1Deck.indexOf(played_card)
@@ -492,8 +491,6 @@ const visaoPlayer = ({
                                 currentNumber: 252,
                                 drawCardPile: [...copiedDrawCardPileArray]
                             })
-
-                            forgotUno()
                         }
                         else {
                             !isSoundMuted && playDraw2CardSound()
@@ -508,7 +505,9 @@ const visaoPlayer = ({
                                 currentNumber: 252,
                                 drawCardPile: [...copiedDrawCardPileArray]
                             })
-                        }
+                        } */
+                        const forgotPressUno = player1Deck.length===2 && !isUnoButtonPressed
+                        drag2("Player 1",played_card,colorOfPlayedCard,252,"Player 2", forgotPressUno)
                     }
                     else {
                         //remove the played card from player2's deck and add it to playedCardsPile (immutably)
@@ -801,9 +800,8 @@ const visaoPlayer = ({
                             currentColor: newColor,
                             currentNumber: 600,
                             drawCardPile: [...copiedDrawCardPileArray]
-                        }
+                        })
                         forgotUno()
-                        )
                     }
                     else {
                         !isSoundMuted && playDraw4CardSound()
@@ -888,7 +886,8 @@ const visaoPlayer = ({
             break;
         }
     }
-    const drag2 = (player,turn,played_card,colorOfPlayedCard,numberOfPlayedCard,opponent,isForgotUno=false) => {
+
+    const drag2 = (player,played_card,colorOfPlayedCard,numberOfPlayedCard,opponent,isForgotUno=false) => {
         const opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
 
         const modifiedDeck = [...drawCardPile]
@@ -898,15 +897,15 @@ const visaoPlayer = ({
 
         opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard1, opponentDrawCard2, ...opponentDeck.slice(opponentDeck.length)]
 
-        if(forgotUno){
-            forgotUno(player,turn,played_card,colorOfPlayedCard,numberOfPlayedCard,
+        if(isForgotUno){
+            forgotUno(player,player,played_card,colorOfPlayedCard,numberOfPlayedCard,
                 opponentDeck,modifiedDeck)
         }else{
             socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
                 colorOfPlayedCard,numberOfPlayedCard,modifiedDeck,opponentDeck)
         }
     }
-    
+
     const forgotUno = (player,turn, played_card, colorOfPlayedCard,numberOfPlayedCard, opponentsDeck=null, modifiedDeck=null) => {
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
         const removeIndex = playerDeck.indexOf(played_card);
@@ -940,7 +939,7 @@ const visaoPlayer = ({
                                         modifiedDrawCardPile,
                                         opponentsDeck = null,) => {
 
-        const obj;
+        const obj = "";
         
         if(winner=='Player 1'){
           obj =  opponentsDeck !== null ? 
