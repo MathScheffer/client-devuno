@@ -67,7 +67,7 @@ const VisaoPlayer = ({
                                 currentColor: colorOfPlayedCard,
                                 currentNumber: numberOfPlayedCard,
                                 drawCardPile: [...copiedDrawCardPileArray]
-                            })
+                            })*/
                             forgotUno('Player 1','Player 2',played_card,colorOfPlayedCard,numberOfPlayedCard)
                         }
                         else {
@@ -841,6 +841,7 @@ const VisaoPlayer = ({
                     } 
                     */
 
+
                     drag4('Player 1',played_card,'Player 2',player1Deck.length===2 && !isUnoButtonPressed)
                 }
                 else {
@@ -916,8 +917,15 @@ const VisaoPlayer = ({
     }
 
     const drag2 = (player,played_card,colorOfPlayedCard,numberOfPlayedCard,opponent,isForgotUno=false) => {
+        
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
-        const opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
+        
+        let opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
+
+        console.log("Drag2 Player: ",player)
+        console.log("Drag2 Opponent: ",opponent)
+        console.log("Player Deck: ",playerDeck)
+        console.log("Opponent Deck: ",opponentDeck)
 
         const modifiedDeck = [...drawCardPile]
 
@@ -925,14 +933,14 @@ const VisaoPlayer = ({
         const opponentDrawCard2 = modifiedDeck.pop()
 
         opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard1, opponentDrawCard2, ...opponentDeck.slice(opponentDeck.length)]
-
+        console.log("Updated Opponent Deck: ",opponentDeck)
         if(isForgotUno){
             forgotUno(player,player,played_card,colorOfPlayedCard,numberOfPlayedCard,
                 opponentDeck,modifiedDeck)
         }else{
             const removeIndex = playerDeck.indexOf(played_card);
             const updatedPlayerDeck = 
-                [...playerDeck.slice(0,removeIndex), ...playerDeck(0,removeIndex+1)]
+                [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
 
             socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
                 colorOfPlayedCard,numberOfPlayedCard,modifiedDeck,opponentDeck)
@@ -940,25 +948,39 @@ const VisaoPlayer = ({
     }
 
     const wildCard = (player,turn,played_card,isForgotUno=false) => {
-       const newColor = prompt('Enter first letter of new color (R/G/B/Y)').toUpperCase()
-       const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
+       let newColor = prompt('Enter first letter of new color (R/G/B/Y)')
+       if(newColor){
+           console.log(newColor)
+        newColor = newColor.toUpperCase()
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
 
-        if(isForgotUno){
-            forgotUno(player,turn,played_card,newColor,300)
+            if(isForgotUno){
+                forgotUno(player,turn,played_card,newColor,300)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card);
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+                
+
+
+                !isSoundMuted && playWildCardSound()
+                socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
+                    newColor,300)
+            }
         }else{
-            const removeIndex = playerDeck.indexOf(played_card);
-            const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck(0,removeIndex+1)]
-
-            !isSoundMuted && playWildCardSound()
-            socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
-                newColor,300)
+            alert("Invalid Color!")
         }
     }
 
     const drag4 = (player,played_card,opponent,isForgotUno=false) => {
         const newColor = prompt('Enter first letter of new color (R/G/B/Y)').toUpperCase()
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
-        const opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
+        let opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
+
+        console.log("Drag2 Player: ",player)
+        console.log("Drag2 Opponent: ",opponent)
+        console.log("Player Deck: ",playerDeck)
+        console.log("Opponent Deck: ",opponentDeck)
+
         const modifiedDeck = [...drawCardPile]
         //VERIFICAR POSSIBILIDADE DE BUG SE HOUVER MENOS DE 4 CARTAS A SEREM TIRADAS
         const opponentDrawCard1 = modifiedDeck.pop()
@@ -967,15 +989,17 @@ const VisaoPlayer = ({
         const opponentDrawCard4 = modifiedDeck.pop()      
 
         opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard1, opponentDrawCard2,opponentDrawCard3,opponentDrawCard4, ...opponentDeck.slice(opponentDeck.length)]
-
+        console.log("Updated Opponent Deck: ",opponentDeck)
         if(isForgotUno){
             forgotUno(player,player,played_card,newColor,600,
                 opponentDeck,modifiedDeck)
         }else{
+            
             const removeIndex = playerDeck.indexOf(played_card);
+            console.log("Creating updatedPlayerDeck of ",player)
             const updatedPlayerDeck = 
-                [...playerDeck.slice(0,removeIndex), ...playerDeck(0,removeIndex+1)]
-
+                [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+                console.log("updated Player Deck: ",updatedPlayerDeck)
             socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
                 newColor,600,modifiedDeck,opponentDeck)
         }
@@ -1015,7 +1039,13 @@ const VisaoPlayer = ({
                                         modifiedDrawCardPile,
                                         opponentsDeck = null,) => {
 
-        const obj = "";
+        console.log("Socket emit")
+        console.log({
+            player: winner,
+            updatedPlayerDeck: updatedPlayerDeck,
+            opponentsDeck:opponentsDeck
+        })
+        let obj = "";
         
         if(winner=='Player 1'){
           obj =  opponentsDeck !== null ? 
