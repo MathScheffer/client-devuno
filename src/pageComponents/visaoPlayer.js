@@ -14,7 +14,7 @@ const visaoPlayer = ({
     playSkipCardSound,
     playDraw2CardSound,
     playWildCardSound,
-    playDraw4CardSound}) => {
+    playDraw4CardSound,onCardDrawnHandler}) => {
 
     const [isUnoButtonPressed, setUnoButtonPressed] = useState(false)
 

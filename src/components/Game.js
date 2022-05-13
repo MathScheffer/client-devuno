@@ -4,6 +4,7 @@ import shuffleArray from '../utils/shuffleArray'
 import io from 'socket.io-client'
 import queryString from 'query-string'
 import Spinner from './Spinner'
+import VisaoPlayer from '../pageComponents/visaoPlayer'
 import useSound from 'use-sound'
 
 import bgMusic from '../assets/sounds/game-bg-music.mp3'
@@ -1243,7 +1244,8 @@ const Game = (props) => {
                     {gameOver ? <div>{winner !== '' && <><h1>GAME OVER</h1><h2>{winner} wins!</h2></>}</div> :
                     <div>
                         {/* PLAYER 1 VIEW */}
-                        {currentUser === 'Player 1' && <>    
+                        {currentUser === 'Player 1' && <>  
+                        {/*   
                             <div className='player2Deck' style={{pointerEvents: 'none'}}>
                                 <p className='playerDeckText'>Player 2</p>
                                 {player2Deck.map((item, i) => (
@@ -1305,7 +1307,25 @@ const Game = (props) => {
                                     </div>
                                 </div>
                             </div> 
-                        </> }
+                        </> */}
+                        <VisaoPlayer  player='Player 1'
+                                        turn={turn }
+                                        currentColor={currentColor}
+                                        player1Deck={player1Deck}
+                                        player2Deck={player2Deck}
+                                        drawCardPile={drawCardPile}
+                                        isSoundMuted={isSoundMuted}
+                                        playShufflingSound={playShufflingSound}
+                                        playedCardsPile={playedCardsPile}
+                                        currentNumber={currentNumber}
+                                        playSkipCardSound={playSkipCardSound}
+                                        playDraw2CardSound={playDraw2CardSound}
+                                        playWildCardSound={playWildCardSound}
+                                        playDraw4CardSound={playDraw4CardSound}
+                                        onCardDrawnHandler={onCardDrawnHandler}
+                        />
+                        </>
+                        }
 
                         {/* PLAYER 2 VIEW */}
                         {currentUser === 'Player 2' && <>
