@@ -1308,7 +1308,7 @@ const Game = (props) => {
                                 </div>
                             </div> 
                         </> */}
-                        <VisaoPlayer  player='Player 1'
+                       { <VisaoPlayer  player='Player 1'
                                         turn={turn }
                                         currentColor={currentColor}
                                         player1Deck={player1Deck}
@@ -1323,7 +1323,13 @@ const Game = (props) => {
                                         playWildCardSound={playWildCardSound}
                                         playDraw4CardSound={playDraw4CardSound}
                                         onCardDrawnHandler={onCardDrawnHandler}
-                        />
+                                        socket={socket}
+                                        message={message}
+                                        messages={messages}
+                                        setMessage={setMessage}
+                                        setMessages={setMessages}
+
+                        />}
                         </>
                         }
 

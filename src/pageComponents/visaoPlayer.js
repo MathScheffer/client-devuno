@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import useSound from 'use-sound'
+import unoSound from '../assets/sounds/uno-sound.mp3'
 
-const visaoPlayer = ({
+import Spinner from '../components/Spinner'
+const VisaoPlayer = ({
     player,
     turn,
     currentColor,
@@ -14,9 +17,15 @@ const visaoPlayer = ({
     playSkipCardSound,
     playDraw2CardSound,
     playWildCardSound,
-    playDraw4CardSound,onCardDrawnHandler}) => {
+    playDraw4CardSound,onCardDrawnHandler,
+    socket,
+//transferir para o componente
+    message,messages,setMessage,setMessages
+}) => {
 
     const [isUnoButtonPressed, setUnoButtonPressed] = useState(false)
+    const [playUnoSound] = useSound(unoSound)
+    const [isChatBoxHidden, setChatBoxHidden] = useState(true)
 
     const onCardPlayedHandler = (played_card) => {
         //extract player who played the card
@@ -932,6 +941,7 @@ const visaoPlayer = ({
 
     const wildCard = (player,turn,played_card,isForgotUno=false) => {
        const newColor = prompt('Enter first letter of new color (R/G/B/Y)').toUpperCase()
+       const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
 
         if(isForgotUno){
             forgotUno(player,turn,played_card,newColor,300)
@@ -1062,6 +1072,51 @@ const visaoPlayer = ({
     const checkWinner = (arr, player) => {
         return arr.length === 1 ? player : ''
     }
+
+    const toggleChatBox = () => {
+        const chatBody = document.querySelector('.chat-body')
+        if(isChatBoxHidden) {
+            chatBody.style.display = 'block'
+            setChatBoxHidden(false)
+        }
+        else {
+            chatBody.style.display = 'none'
+            setChatBoxHidden(true)
+        }
+    }
+
+    const sendMessage= (event) => {
+        event.preventDefault()
+        if(message) {
+            socket.emit('sendMessage', { message: message }, () => {
+                setMessage('')
+            })
+        }
+    }
+
+
+    {/*  <VisaoPlayer  player='Player 1'
+                                        turn={turn }
+                                        currentColor={currentColor}
+                                        player1Deck={player1Deck}
+                                        player2Deck={player2Deck}
+                                        drawCardPile={drawCardPile}
+                                        isSoundMuted={isSoundMuted}
+                                        playShufflingSound={playShufflingSound}
+                                        playedCardsPile={playedCardsPile}
+                                        currentNumber={currentNumber}
+                                        playSkipCardSound={playSkipCardSound}
+                                        playDraw2CardSound={playDraw2CardSound}
+                                        playWildCardSound={playWildCardSound}
+                                        playDraw4CardSound={playDraw4CardSound}
+                                        onCardDrawnHandler={onCardDrawnHandler}
+                                        socket={socket}
+                                        message={message}
+                                        messages={messages}
+                                        setMessage={setMessage}
+                                        setMessages={setMessages}
+
+                        /> */}
   return (
       <div>
             <div className={'player2Deck'} style={{pointerEvents: 'none'}}>
@@ -1129,4 +1184,4 @@ const visaoPlayer = ({
   )
 }
 
-export default visaoPlayer
+export default VisaoPlayer
