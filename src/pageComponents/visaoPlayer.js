@@ -30,6 +30,7 @@ const VisaoPlayer = ({
     const onCardPlayedHandler = (played_card) => {
         //extract player who played the card
         const cardPlayedBy = turn
+        console.log(played_card)
         switch(played_card) {
             //if card played was a number card
             case '0R': case '1R': case '2R': case '3R': case '4R': case '5R': case '6R': case '7R': case '8R': case '9R': case '_R': case '0G': case '1G': case '2G': case '3G': case '4G': case '5G': case '6G': case '7G': case '8G': case '9G': case '_G': case '0B': case '1B': case '2B': case '3B': case '4B': case '5B': case '6B': case '7B': case '8B': case '9B': case '_B': case '0Y': case '1Y': case '2Y': case '3Y': case '4Y': case '5Y': case '6Y': case '7Y': case '8Y': case '9Y': case '_Y': {
@@ -64,7 +65,6 @@ const VisaoPlayer = ({
                     else {
                         //remove the played card from player2's deck and add it to playedCardsPile (immutably)
                         //then update turn, currentColor and currentNumber
-                        const removeIndex = player2Deck.indexOf(played_card)
                         //if two cards remaining check if player pressed UNO button
                         //if not pressed add 2 cards as penalty
                         if(player2Deck.length===2 && !isUnoButtonPressed) {
@@ -103,7 +103,7 @@ const VisaoPlayer = ({
                             !isSoundMuted && playShufflingSound()
 
                             const updatedPlayer1Deck = [...player1Deck.slice(0, removeIndex), ...player1Deck.slice(removeIndex + 1)]
-                            socketEmitUpdateGameState("Player 1","Player 1",played_card,
+                            socketEmitUpdateGameState("Player 1","Player 2",played_card,
                                 updatedPlayer1Deck,colorOfPlayedCard,numberOfPlayedCard)
                         }
                     }
@@ -296,7 +296,8 @@ const VisaoPlayer = ({
     }
 
     const drag2 = (player,played_card,colorOfPlayedCard,numberOfPlayedCard,opponent,isForgotUno=false) => {
-        
+        const nextTurn = player == 'Player 1' ? 'Player 2' : 'Player 1'
+
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
         
         let opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
@@ -309,14 +310,14 @@ const VisaoPlayer = ({
         opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard1, opponentDrawCard2, ...opponentDeck.slice(opponentDeck.length)]
 
         if(isForgotUno){
-            forgotUno(player,player,played_card,colorOfPlayedCard,numberOfPlayedCard,
+            forgotUno(player,nextTurn,played_card,colorOfPlayedCard,numberOfPlayedCard,
                 opponentDeck,modifiedDeck)
         }else{
             const removeIndex = playerDeck.indexOf(played_card);
             const updatedPlayerDeck = 
                 [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
 
-            socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
+            socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,
                 colorOfPlayedCard,numberOfPlayedCard,modifiedDeck,opponentDeck)
         }
     }
