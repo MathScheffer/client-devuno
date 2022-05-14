@@ -301,18 +301,13 @@ const VisaoPlayer = ({
         
         let opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
 
-        console.log("Drag2 Player: ",player)
-        console.log("Drag2 Opponent: ",opponent)
-        console.log("Player Deck: ",playerDeck)
-        console.log("Opponent Deck: ",opponentDeck)
-
         const modifiedDeck = [...drawCardPile]
 
         const opponentDrawCard1 = modifiedDeck.pop()
         const opponentDrawCard2 = modifiedDeck.pop()
 
         opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard1, opponentDrawCard2, ...opponentDeck.slice(opponentDeck.length)]
-        console.log("Updated Opponent Deck: ",opponentDeck)
+
         if(isForgotUno){
             forgotUno(player,player,played_card,colorOfPlayedCard,numberOfPlayedCard,
                 opponentDeck,modifiedDeck)
@@ -355,11 +350,6 @@ const VisaoPlayer = ({
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
         let opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
 
-        console.log("Drag2 Player: ",player)
-        console.log("Drag2 Opponent: ",opponent)
-        console.log("Player Deck: ",playerDeck)
-        console.log("Opponent Deck: ",opponentDeck)
-
         const modifiedDeck = [...drawCardPile]
         //VERIFICAR POSSIBILIDADE DE BUG SE HOUVER MENOS DE 4 CARTAS A SEREM TIRADAS
         const opponentDrawCard1 = modifiedDeck.pop()
@@ -374,11 +364,11 @@ const VisaoPlayer = ({
                 opponentDeck,modifiedDeck)
         }else{
             
-            const removeIndex = playerDeck.indexOf(played_card);
-            console.log("Creating updatedPlayerDeck of ",player)
+            const removeIndex = playerDeck.indexOf(played_card)
             const updatedPlayerDeck = 
                 [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
                 console.log("updated Player Deck: ",updatedPlayerDeck)
+
             socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
                 newColor,600,modifiedDeck,opponentDeck)
         }
@@ -408,6 +398,10 @@ const VisaoPlayer = ({
             copiedDrawCardPileArray, opponentsDeck)
     }
 
+        /**
+         * modifiedDrawCardPile -> Caso haja alteração no baralho antes de executar a função
+         * oponnentsDeck -> Caso o deck do oponente seja modificado, passar este parâmetro
+         */
     const socketEmitUpdateGameState = (
                                         winner,
                                         turn,
