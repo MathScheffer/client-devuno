@@ -1335,6 +1335,7 @@ const Game = (props) => {
 
                         {/* PLAYER 2 VIEW */}
                         {currentUser === 'Player 2' && <>
+                        {/* *
                             <div className='player1Deck' style={{pointerEvents: 'none'}}>
                                 <p className='playerDeckText'>Player 1</p>
                                 {player1Deck.map((item, i) => (
@@ -1395,7 +1396,28 @@ const Game = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                            </div> 
+                                        </div> */}
+                                  <VisaoPlayer  player='Player 2'
+                                        turn={turn }
+                                        currentColor={currentColor}
+                                        player1Deck={player1Deck}
+                                        player2Deck={player2Deck}
+                                        drawCardPile={drawCardPile}
+                                        isSoundMuted={isSoundMuted}
+                                        playShufflingSound={playShufflingSound}
+                                        playedCardsPile={playedCardsPile}
+                                        currentNumber={currentNumber}
+                                        playSkipCardSound={playSkipCardSound}
+                                        playDraw2CardSound={playDraw2CardSound}
+                                        playWildCardSound={playWildCardSound}
+                                        playDraw4CardSound={playDraw4CardSound}
+                                        onCardDrawnHandler={onCardDrawnHandler}
+                                        socket={socket}
+                                        message={message}
+                                        messages={messages}
+                                        setMessage={setMessage}
+                                        setMessages={setMessages}
+                                />
                         </> }
                     </div> }
                 </> }
