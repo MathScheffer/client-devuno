@@ -16,6 +16,7 @@ import wildCardSound from '../assets/sounds/wild-sound.mp3'
 import draw4CardSound from '../assets/sounds/draw4-sound.mp3'
 import gameOverSound from '../assets/sounds/game-over-sound.mp3'
 import useWhileCard from '../customHooks/useWhileCard'
+import { waitFor } from '@testing-library/react'
 
 //NUMBER CODES FOR ACTION CARDS
 //SKIP - 404
@@ -30,6 +31,7 @@ const ENDPOINT = 'http://localhost:5000'
 
 const Game = (props) => {
     const [lastNumber, setLastNumber] = useState('')
+    const [isWhileCardOnPile, setIsWhileCardOnPile] = useState('')
 
     const data = queryString.parse(props.location.search)
 
@@ -109,7 +111,9 @@ const Game = (props) => {
             shuffledCards[startingCardIndex]==='skipG' || shuffledCards[startingCardIndex]==='_G' || shuffledCards[startingCardIndex]==='D2G' ||
             shuffledCards[startingCardIndex]==='skipB' || shuffledCards[startingCardIndex]==='_B' || shuffledCards[startingCardIndex]==='D2B' ||
             shuffledCards[startingCardIndex]==='skipY' || shuffledCards[startingCardIndex]==='_Y' || shuffledCards[startingCardIndex]==='D2Y' ||
-            shuffledCards[startingCardIndex]==='W' || shuffledCards[startingCardIndex]==='D4W') {
+            shuffledCards[startingCardIndex]==='W' || shuffledCards[startingCardIndex]==='D4W'||
+            shuffledCards[startingCardIndex]==='WHILE_R' || shuffledCards[startingCardIndex]==='WHILE_G' || 
+            shuffledCards[startingCardIndex]==='WHILE_B' || shuffledCards[startingCardIndex]==='WHILE_Y') {
                 continue;
             }
             else
@@ -132,13 +136,14 @@ const Game = (props) => {
             currentNumber: playedCardsPile[0].charAt(0),
             playedCardsPile: [...playedCardsPile],
             drawCardPile: [...drawCardPile],
-            lastNumber: playedCardsPile[0].charAt(0)
+            lastNumber: playedCardsPile[0].charAt(0),
+            isWhileCardOnPile: false
         })
     }, [])
 
     useEffect(() => {
 
-        socket.on('initGameState', ({ gameOver, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber }) => {
+        socket.on('initGameState', ({ gameOver, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber, isWhileCardOnPile }) => {
             setGameOver(gameOver)
             setTurn(turn)
             setPlayer1Deck(player1Deck)
@@ -148,13 +153,14 @@ const Game = (props) => {
             setPlayedCardsPile(playedCardsPile)
             setDrawCardPile(drawCardPile)
             setLastNumber(lastNumber)
+            setIsWhileCardOnPile(isWhileCardOnPile)
   /*           setWhileCardConf(whileCardConf)
             
             console.log("Current number conf init: ",currentNumber)
             console.log("While card conf init: ",whileCardConf) */
         })
 
-        socket.on('updateGameState', ({ gameOver, winner, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber }) => {
+        socket.on('updateGameState', ({ gameOver, winner, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber, isWhileCardOnPile }) => {
             gameOver && setGameOver(gameOver)
             gameOver===true && playGameOverSound()
             winner && setWinner(winner)
@@ -167,9 +173,11 @@ const Game = (props) => {
             drawCardPile && setDrawCardPile(drawCardPile)
            // whileCardConf && setWhileCardConf(whileCardConf)
             lastNumber && setLastNumber(lastNumber)
+            isWhileCardOnPile && setIsWhileCardOnPile(isWhileCardOnPile)
             //console.log("While card conf update: ",whileCardConf)
             console.log("Current number update: ",currentNumber)
             console.log("Last number conf update: ",lastNumber)
+            console.log('isWhileCardOnPile update: ', isWhileCardOnPile)
             setUnoButtonPressed(false)
         })
 
@@ -189,19 +197,12 @@ const Game = (props) => {
         })
     }, [])
 
-    //some util functions
-    const checkGameOver = (arr) => {
-        return arr.length === 1
-    }
-    
-    const checkWinner = (arr, player) => {
-        return arr.length === 1 ? player : ''
-    }
-
 
     const onCardDrawnHandler = () => {
         //extract player who drew the card
         const cardDrawnBy = turn
+        console.log('Turn on top: ', turn)
+        console.log('isWhileCardOnPile on top :',isWhileCardOnPile)
         //check who drew the card and return new state accordingly
         if(cardDrawnBy === 'Player 1') {
             //remove 1 new card from drawCardPile and add it to player1's deck (immutably)
@@ -212,7 +213,51 @@ const Game = (props) => {
             //extract number and color of drawn card
             const colorOfDrawnCard = drawCard.charAt(drawCard.length - 1)
             let numberOfDrawnCard = drawCard.charAt(0)
-            if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {
+
+            //se o número jogado é igual ao último número e há uma carta 'WHILE' na mesa 
+            console.log('JOGADOR 1: ')
+            console.log('numberOfDrawnCard: ',numberOfDrawnCard)
+            console.log('lastNumber: ',lastNumber)
+            console.log('isWhileCardOnPile: ',isWhileCardOnPile)
+            console.log('drawCard: ',drawCard)
+            
+            
+            console.log('DrawCardPile: ',drawCardPile)
+            
+            
+            if(numberOfDrawnCard == lastNumber && isWhileCardOnPile){
+                console.log('numberOfDrawnCard == lastNumber && isWhileCardOnPile: ',numberOfDrawnCard == lastNumber && isWhileCardOnPile)
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    turn: 'Player 2',
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentColor: colorOfDrawnCard,
+                    currentNumber: numberOfDrawnCard,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                })
+                setTimeout(function(){
+                    console.log('Setou isWhileCardOnPile: ',isWhileCardOnPile)
+                    console.log('Turn: ',turn)
+                }, 4000);
+            }
+            //se o número jogado não é igual ao último número da mesa e há uma carta "WHILE"
+            //entao compra e mantem o turno
+            else if(numberOfDrawnCard != lastNumber && isWhileCardOnPile){
+                console.log('numberOfDrawnCard != lastNumber && isWhileCardOnPile',numberOfDrawnCard != lastNumber && isWhileCardOnPile)
+                alert(`You drew ${drawCard}.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    turn: 'Player 1',
+                    player1Deck: [...player1Deck.slice(0, player1Deck.length), drawCard, ...player1Deck.slice(player1Deck.length)],
+                    drawCardPile: [...copiedDrawCardPileArray]
+                })
+            }
+            else if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {
+                console.log("colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'): ",colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'))
                 alert(`You drew ${drawCard}. It was played for you.`)
                 !isSoundMuted && playShufflingSound()
                 //send new state to server
@@ -224,6 +269,8 @@ const Game = (props) => {
                 })
             }
             else if(colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y')) {
+                console.log("colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y'): ",colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y'))
+
                 alert(`You drew ${drawCard}. It was played for you.`)
                 //remove 2 new cards from drawCardPile and add them to player2's deck (immutably)
                 //make a copy of drawCardPile array
@@ -242,6 +289,7 @@ const Game = (props) => {
                 })
             }
             else if(drawCard === 'W') {
+                console.log("drawCard === 'W': ",drawCard === 'W')
                 alert(`You drew ${drawCard}. It was played for you.`)
                 //ask for new color
                 const newColor = prompt('Enter first letter of new color (R/G/B/Y)').toUpperCase()
@@ -256,6 +304,7 @@ const Game = (props) => {
                 })
             }
             else if(drawCard === 'D4W') {
+                console.log("drawCard === 'W' :",drawCard === 'W')
                 alert(`You drew ${drawCard}. It was played for you.`)
                 //ask for new color
                 const newColor = prompt('Enter first letter of new color (R/G/B/Y)').toUpperCase()
@@ -278,20 +327,24 @@ const Game = (props) => {
                 })
             }
             //if not action card - check if drawn card is playable
-            else if(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor) {
+            else if((numberOfDrawnCard == currentNumber || colorOfDrawnCard === currentColor) ) {
+                console.log("(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor) :",(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor) )
                 alert(`You drew ${drawCard}. It was played for you.`)
                 !isSoundMuted && playShufflingSound()
-                //send new state to server
+                console.log('isWhileCardOnPile: ',drawCard.includes('WHILE') )
                 socket.emit('updateGameState', {
                     turn: 'Player 2',
                     playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
                     currentColor: colorOfDrawnCard,
                     currentNumber: numberOfDrawnCard,
-                    drawCardPile: [...copiedDrawCardPileArray]
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: drawCard.includes('WHILE')
                 })
+                console.log('Setou isWhileCardOnPile: ', isWhileCardOnPile)
             }
             //else add the drawn card to player1's deck
             else {
+                console.log('just add the drawn card to player1 deck')
                 !isSoundMuted && playShufflingSound()
                 //send new state to server
                 socket.emit('updateGameState', {
@@ -310,7 +363,47 @@ const Game = (props) => {
             //extract number and color of drawn card
             const colorOfDrawnCard = drawCard.charAt(drawCard.length - 1)
             let numberOfDrawnCard = drawCard.charAt(0)
-            if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {
+            console.log('JOGADOR 2: ')
+            console.log('numberOfDrawnCard: ',numberOfDrawnCard)
+            console.log('isWhileCardOnPile: ',isWhileCardOnPile)
+            console.log('lastNumber: ',lastNumber)
+            console.log('drawCard: ',drawCard)
+            
+            console.log('DrawCardPile: ',drawCardPile)
+            //se o número jogado é igual ao último número e há uma carta 'WHILE' na mesa 
+            if(numberOfDrawnCard == lastNumber && isWhileCardOnPile){
+                console.log('numberOfDrawnCard === lastNumber && isWhileCardOnPile: ',numberOfDrawnCard == lastNumber && isWhileCardOnPile)
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    turn: 'Player 1',
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentColor: colorOfDrawnCard,
+                    currentNumber: numberOfDrawnCard,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                })
+                setTimeout(function(){
+                    console.log('Setou isWhileCardOnPile: ',isWhileCardOnPile)
+                    console.log('Turn: ',turn)
+                }, 4000);
+               
+            }
+            //se o número jogado não é igual ao último número da mesa e há uma carta "WHILE"
+            //entao compra e mantem o turno
+            else if(numberOfDrawnCard != lastNumber && isWhileCardOnPile){
+                console.log('numberOfDrawnCard != lastNumber && isWhileCardOnPile',numberOfDrawnCard != lastNumber && isWhileCardOnPile)
+                alert(`You drew ${drawCard}.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    player2Deck: [...player2Deck.slice(0, player2Deck.length), drawCard, ...player2Deck.slice(player2Deck.length)],
+                    drawCardPile: [...copiedDrawCardPileArray]
+                })
+            }
+            else if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {
+                console.log("colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'): ",colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'))
                 alert(`You drew ${drawCard}. It was played for you.`)
                 !isSoundMuted && playShufflingSound()
                 //send new state to server
@@ -322,6 +415,7 @@ const Game = (props) => {
                 })
             }
             else if(colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y')) {
+                console.log("colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y'): ",colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y'))
                 alert(`You drew ${drawCard}. It was played for you.`)
                 //remove 2 new cards from drawCardPile and add them to player1's deck (immutably)
                 //make a copy of drawCardPile array
@@ -340,6 +434,7 @@ const Game = (props) => {
                 })
             }
             else if(drawCard === 'W') {
+                console.log("drawCard === 'W': ",drawCard === 'W')
                 alert(`You drew ${drawCard}. It was played for you.`)
                 //ask for new color
                 const newColor = prompt('Enter first letter of new color (R/G/B/Y)').toUpperCase()
@@ -354,6 +449,7 @@ const Game = (props) => {
                 })
             }
             else if(drawCard === 'D4W') {
+                console.log("drawCard === 'D4W'",drawCard === 'D4W')
                 alert(`You drew ${drawCard}. It was played for you.`)
                 //ask for new color
                 const newColor = prompt('Enter first letter of new color (R/G/B/Y)').toUpperCase()
@@ -376,20 +472,28 @@ const Game = (props) => {
                 })
             }
             //if not action card - check if drawn card is playable
-            else if(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor) {
+            else if((numberOfDrawnCard == currentNumber || colorOfDrawnCard === currentColor)) {
+                console.log("(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor): ",(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor))
                 alert(`You drew ${drawCard}. It was played for you.`)
                 !isSoundMuted && playShufflingSound()
+                console.log('isWhileCardOnPile: ',drawCard.includes('WHILE') )
                 //send new state to server
                 socket.emit('updateGameState', {
                     turn: 'Player 1',
                     playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
                     currentColor: colorOfDrawnCard,
                     currentNumber: numberOfDrawnCard,
-                    drawCardPile: [...copiedDrawCardPileArray]
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: drawCard.includes('WHILE')
                 })
+                console.log('Setou isWhileCardOnPile: ',isWhileCardOnPile)
+
             }
+           
+            
             //else add the drawn card to player2's deck
             else {
+                console.log('just add the drawn card to player 2 deck')
                 !isSoundMuted && playShufflingSound()
                 //send new state to server
                 socket.emit('updateGameState', {
@@ -400,7 +504,7 @@ const Game = (props) => {
             }
         }
     }
-    
+
     return (
         <div className={`Game backgroundColorR backgroundColor${currentColor}`}>
             {(!roomFull) ? <>
@@ -452,7 +556,7 @@ const Game = (props) => {
                                         setMessage={setMessage}
                                         setMessages={setMessages}
                                         lastNumber={lastNumber}
-                                        //whileCardConf={whileCardConf}
+                                        isWhileCardOnPile={isWhileCardOnPile}
 
                         />}
                         </>
@@ -482,7 +586,7 @@ const Game = (props) => {
                                         setMessage={setMessage}
                                         setMessages={setMessages}
                                         lastNumber={lastNumber}
-                                        //whileCardConf={whileCardConf}
+                                        isWhileCardOnPile={isWhileCardOnPile}
                                 />
                         </> }
                     </div> }
