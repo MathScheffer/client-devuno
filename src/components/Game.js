@@ -15,18 +15,22 @@ import draw2CardSound from '../assets/sounds/draw2-sound.mp3'
 import wildCardSound from '../assets/sounds/wild-sound.mp3'
 import draw4CardSound from '../assets/sounds/draw4-sound.mp3'
 import gameOverSound from '../assets/sounds/game-over-sound.mp3'
+import useWhileCard from '../customHooks/useWhileCard'
 
 //NUMBER CODES FOR ACTION CARDS
 //SKIP - 404
 //DRAW 2 - 252
 //WILD - 300
 //DRAW 4 WILD - 600
+//WHILECARD - 100
 
 let socket
 // const ENDPOINT = 'http://localhost:5000'
 const ENDPOINT = 'http://localhost:5000'
 
 const Game = (props) => {
+    const [lastNumber, setLastNumber] = useState('')
+
     const data = queryString.parse(props.location.search)
 
     //initialize socket state
@@ -58,6 +62,8 @@ const Game = (props) => {
             socket.off()
         }
     }, [])
+
+
 
     //initialize game state
     const [gameOver, setGameOver] = useState(true)
@@ -125,12 +131,14 @@ const Game = (props) => {
             currentColor: playedCardsPile[0].charAt(1),
             currentNumber: playedCardsPile[0].charAt(0),
             playedCardsPile: [...playedCardsPile],
-            drawCardPile: [...drawCardPile]
+            drawCardPile: [...drawCardPile],
+            lastNumber: playedCardsPile[0].charAt(0)
         })
     }, [])
 
     useEffect(() => {
-        socket.on('initGameState', ({ gameOver, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile }) => {
+
+        socket.on('initGameState', ({ gameOver, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber }) => {
             setGameOver(gameOver)
             setTurn(turn)
             setPlayer1Deck(player1Deck)
@@ -139,9 +147,14 @@ const Game = (props) => {
             setCurrentNumber(currentNumber)
             setPlayedCardsPile(playedCardsPile)
             setDrawCardPile(drawCardPile)
+            setLastNumber(lastNumber)
+  /*           setWhileCardConf(whileCardConf)
+            
+            console.log("Current number conf init: ",currentNumber)
+            console.log("While card conf init: ",whileCardConf) */
         })
 
-        socket.on('updateGameState', ({ gameOver, winner, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile }) => {
+        socket.on('updateGameState', ({ gameOver, winner, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber }) => {
             gameOver && setGameOver(gameOver)
             gameOver===true && playGameOverSound()
             winner && setWinner(winner)
@@ -152,6 +165,11 @@ const Game = (props) => {
             currentNumber && setCurrentNumber(currentNumber)
             playedCardsPile && setPlayedCardsPile(playedCardsPile)
             drawCardPile && setDrawCardPile(drawCardPile)
+           // whileCardConf && setWhileCardConf(whileCardConf)
+            lastNumber && setLastNumber(lastNumber)
+            //console.log("While card conf update: ",whileCardConf)
+            console.log("Current number update: ",currentNumber)
+            console.log("Last number conf update: ",lastNumber)
             setUnoButtonPressed(false)
         })
 
@@ -179,6 +197,7 @@ const Game = (props) => {
     const checkWinner = (arr, player) => {
         return arr.length === 1 ? player : ''
     }
+
 
     const onCardDrawnHandler = () => {
         //extract player who drew the card
@@ -432,6 +451,8 @@ const Game = (props) => {
                                         messages={messages}
                                         setMessage={setMessage}
                                         setMessages={setMessages}
+                                        lastNumber={lastNumber}
+                                        //whileCardConf={whileCardConf}
 
                         />}
                         </>
@@ -460,6 +481,8 @@ const Game = (props) => {
                                         messages={messages}
                                         setMessage={setMessage}
                                         setMessages={setMessages}
+                                        lastNumber={lastNumber}
+                                        //whileCardConf={whileCardConf}
                                 />
                         </> }
                     </div> }
