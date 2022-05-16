@@ -517,7 +517,6 @@ const VisaoPlayer = ({
         const currentColorOfPlayedCard = colorOfPlayedCard ? colorOfPlayedCard : currentColor;
         const currentNumberOfPlayedCard = numberOfPlayedCard ? numberOfPlayedCard : currentNumber;
 
-        //CONSIDERAR REMOVER O lastNumber da função
         let ln = ''
         try{
             ln =( typeof parseInt(currentNumber) == 'number') && (currentNumber < 10 )? currentNumber : lastNumber
