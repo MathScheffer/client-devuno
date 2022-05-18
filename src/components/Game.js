@@ -24,6 +24,7 @@ import { waitFor } from '@testing-library/react'
 //WILD - 300
 //DRAW 4 WILD - 600
 //WHILECARD - 100
+//BREAK - 101
 
 let socket
 // const ENDPOINT = 'http://localhost:5000'
@@ -107,13 +108,17 @@ const Game = (props) => {
         let startingCardIndex
         while(true) {
             startingCardIndex = Math.floor(Math.random() * 94)
-            if(shuffledCards[startingCardIndex]==='skipR' || shuffledCards[startingCardIndex]==='_R' || shuffledCards[startingCardIndex]==='D2R' ||
-            shuffledCards[startingCardIndex]==='skipG' || shuffledCards[startingCardIndex]==='_G' || shuffledCards[startingCardIndex]==='D2G' ||
-            shuffledCards[startingCardIndex]==='skipB' || shuffledCards[startingCardIndex]==='_B' || shuffledCards[startingCardIndex]==='D2B' ||
-            shuffledCards[startingCardIndex]==='skipY' || shuffledCards[startingCardIndex]==='_Y' || shuffledCards[startingCardIndex]==='D2Y' ||
-            shuffledCards[startingCardIndex]==='W' || shuffledCards[startingCardIndex]==='D4W'||
-            shuffledCards[startingCardIndex]==='WHILE_R' || shuffledCards[startingCardIndex]==='WHILE_G' || 
-            shuffledCards[startingCardIndex]==='WHILE_B' || shuffledCards[startingCardIndex]==='WHILE_Y') {
+            if(shuffledCards[startingCardIndex]==='skipR' || shuffledCards[startingCardIndex]==='_R'      || shuffledCards[startingCardIndex]==='D2R' ||
+            shuffledCards[startingCardIndex]==='skipG'    || shuffledCards[startingCardIndex]==='_G'      || shuffledCards[startingCardIndex]==='D2G' ||
+            shuffledCards[startingCardIndex]==='skipB'    || shuffledCards[startingCardIndex]==='_B'      || shuffledCards[startingCardIndex]==='D2B' ||
+            shuffledCards[startingCardIndex]==='skipY'    || shuffledCards[startingCardIndex]==='_Y'      || shuffledCards[startingCardIndex]==='D2Y' ||
+            shuffledCards[startingCardIndex]==='W'        || shuffledCards[startingCardIndex]==='D4W'     ||
+            shuffledCards[startingCardIndex]==='WHILE_R'  || shuffledCards[startingCardIndex]==='WHILE_G' || 
+            shuffledCards[startingCardIndex]==='WHILE_B'  || shuffledCards[startingCardIndex]==='WHILE_Y' ||
+            shuffledCards[startingCardIndex]==='BREAK_R'  || shuffledCards[startingCardIndex]==='BREAK_G' || 
+            shuffledCards[startingCardIndex]==='BREAK_B'  || shuffledCards[startingCardIndex]==='BREAK_Y'
+            
+            ) {
                 continue;
             }
             else
@@ -258,6 +263,19 @@ const Game = (props) => {
                     isWhileCardOnPile: true
                 })
             }
+            else if(colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    turn: 'Player 2',
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentColor: colorOfDrawnCard,
+                    currentNumber: 101,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                })
+            }
             else if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {
                 console.log("colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'): ",colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'))
                 alert(`You drew ${drawCard}. It was played for you.`)
@@ -347,7 +365,8 @@ const Game = (props) => {
                     isWhileCardOnPile: false
                 })
                 console.log('Setou isWhileCardOnPile: ', isWhileCardOnPile)
-            }else if((colorOfDrawnCard === currentColor) && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y') ) {
+            }
+            else if((colorOfDrawnCard === currentColor) && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y') ) {
                 console.log("(colorOfDrawnCard === currentColor) && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y') :",(colorOfDrawnCard === currentColor) && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y'))
                 alert(`You drew ${drawCard}. It was played for you.`)
                 !isSoundMuted && playShufflingSound()
@@ -418,6 +437,19 @@ const Game = (props) => {
                     player2Deck: [...player2Deck.slice(0, player2Deck.length), drawCard, ...player2Deck.slice(player2Deck.length)],
                     drawCardPile: [...copiedDrawCardPileArray],
                     isWhileCardOnPile: true
+                })
+            }
+            else if(colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    turn: 'Player 1',
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentColor: colorOfDrawnCard,
+                    currentNumber: 101,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
                 })
             }
             else if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {

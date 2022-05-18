@@ -336,6 +336,15 @@ const VisaoPlayer = ({
 
                 break;
             }
+            case 'BREAK_R': case 'BREAK_G': case 'BREAK_B': case 'BREAK_Y':{
+                const colorOfPlayedCard = played_card.charAt(1)
+
+                if(cardPlayedBy === 'Player 1'){
+                    breakCard('Player 1',turn,played_card,colorOfPlayedCard)
+                }else{
+                    breakCard('Player 2',turn,played_card,colorOfPlayedCard)
+                }
+            }
             //if card played was a draw four wild card
             case 'D4W': {
                 //check who played the card and return new state accordingly
@@ -472,6 +481,20 @@ const VisaoPlayer = ({
 
             //socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck)
             console.log('updatedPlayerDeck: ', updatedPlayerDeck)
+        }
+    }
+
+    const breakCard = (player,turn,played_card,colorOfPlayedCard) => {
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
+
+        if(playerDeck.length===2 && !isUnoButtonPressed){
+            forgotUno('Player 1','Player 2', played_card, colorOfPlayedCard,
+            101)
+        }else{
+            const removeIndex = playerDeck.indexOf(played_card)
+            const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
+
+            socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck)
         }
     }
 
