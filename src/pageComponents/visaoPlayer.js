@@ -404,6 +404,7 @@ const VisaoPlayer = ({
                 colorOfPlayedCard,252,modifiedDeck,opponentDeck)
         }
     }
+
     const drag4 = (player,played_card,opponent,isForgotUno=false) => {
         const newColor = prompt('Enter first letter of new color (R/G/B/Y)').toUpperCase()
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
@@ -564,6 +565,7 @@ const VisaoPlayer = ({
         }
        
     }
+
     const forgotUno = (player,turn, played_card, colorOfPlayedCard,numberOfPlayedCard, opponentsDeck=null, modifiedDeck=null, isWhileCardOnPile = false) => {
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
         const removeIndex = playerDeck.indexOf(played_card);
@@ -586,7 +588,6 @@ const VisaoPlayer = ({
             turn,played_card,updatedPlayerDeck, colorOfPlayedCard,numberOfPlayedCard,
             copiedDrawCardPileArray, opponentsDeck, isWhileCardOnPile)
     }
-
         /**
          * modifiedDrawCardPile -> Caso haja alteração no baralho antes de executar a função
          * oponnentsDeck -> Caso o deck do oponente seja modificado, passar este parâmetro
@@ -672,9 +673,6 @@ const VisaoPlayer = ({
     }
 
 
-    const whileLoop = (played_card) => {
-
-    }
     const checkGameOver = (arr) => {
         return arr.length === 1
     }
