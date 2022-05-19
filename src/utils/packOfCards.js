@@ -6,6 +6,6 @@ export default [
     '0Y', '1Y', '1Y', '2Y', '2Y', '3Y', '3Y', '4Y', '4Y', '5Y', '5Y', '6Y', '6Y', '7Y', '7Y', '8Y', '8Y', '9Y', '9Y', 'skipY', 'skipY', '_Y', '_Y', 'D2Y', 'D2Y',
     'W', 'W', 'W', 'W', 'D4W', 'D4W', 'D4W', 'D4W',
     'WHILE_R','WHILE_R','WHILE_G','WHILE_G','WHILE_B','WHILE_B','WHILE_Y','WHILE_Y',
-    'BREAK_R','BREAK_R','BREAK_G','BREAK_G','BREAK_B','BREAK_B','BREAK_Y','BREAK_Y'
+    'BREAK_R','BREAK_R','BREAK_R','BREAK_G','BREAK_G','BREAK_G','BREAK_B','BREAK_B','BREAK_B','BREAK_Y','BREAK_Y','BREAK_Y'
 
 ]

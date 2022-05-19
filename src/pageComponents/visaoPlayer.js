@@ -43,7 +43,8 @@ const VisaoPlayer = ({
                 //extract number and color of played card
                 const numberOfPlayedCard = played_card.charAt(0)
                 const colorOfPlayedCard = played_card.charAt(1)
-
+                console.log('Current Number: ',currentNumber)
+                console.log('Current Color: ',currentNumber)
                 if(currentNumber == 100){
                     if(cardPlayedBy == 'Player 1'){
                        whileCardLoop('Player 1',played_card,numberOfPlayedCard)
@@ -337,13 +338,22 @@ const VisaoPlayer = ({
                 break;
             }
             case 'BREAK_R': case 'BREAK_G': case 'BREAK_B': case 'BREAK_Y':{
-                const colorOfPlayedCard = played_card.charAt(1)
-
                 if(cardPlayedBy === 'Player 1'){
-                    breakCard('Player 1',turn,played_card,colorOfPlayedCard)
+                    breakCard('Player 1',turn,played_card)
                 }else{
-                    breakCard('Player 2',turn,played_card,colorOfPlayedCard)
+                    console.log('WhileCard: ', isWhileCardOnPile)
+                    breakCard('Player 2',turn,played_card)
                 }
+                break;
+            }
+            case 'PASS_R': case 'PASS_G': case 'PASS_B': case 'PASS_Y':{
+                if(cardPlayedBy === 'Player 1'){
+                    pass('Player 1',turn,played_card)
+                }else{
+                    console.log('WhileCard: ', isWhileCardOnPile)
+                    pass('Player 2',turn,played_card)
+                }
+                break;
             }
             //if card played was a draw four wild card
             case 'D4W': {
@@ -484,20 +494,76 @@ const VisaoPlayer = ({
         }
     }
 
-    const breakCard = (player,turn,played_card,colorOfPlayedCard) => {
+    const breakCard = (player,turn,played_card) => {
+        const colorOfPlayedCard = played_card.charAt(played_card.length - 1)
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
+        const nextTurn = turn == 'Player 1' ? 'Player 2' : 'Player 1';
+        console.log("colorOfPlayedCard === currentColor && isWhileCardOnPile && (played_card === 'BREAK_R' || played_card === 'BREAK_G' || played_card === 'BREAK_B' || played_card === 'BREAK_Y' : ",(colorOfPlayedCard === currentColor && isWhileCardOnPile && (played_card === 'BREAK_R' || played_card === 'BREAK_G' || played_card === 'BREAK_B' || played_card === 'BREAK_Y')))
+        if(colorOfPlayedCard === currentColor && isWhileCardOnPile){
+            
 
-        if(playerDeck.length===2 && !isUnoButtonPressed){
-            forgotUno('Player 1','Player 2', played_card, colorOfPlayedCard,
-            101)
-        }else{
-            const removeIndex = playerDeck.indexOf(played_card)
-            const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
-
-            socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck)
+            if(playerDeck.length===2 && !isUnoButtonPressed){
+                forgotUno(player,nextTurn, played_card, colorOfPlayedCard,
+                101)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card)
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
+    
+                socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,colorOfPlayedCard,101)
+            }
         }
+        //Se não houver carta While, atuará como carta break
+        else if(colorOfPlayedCard === currentColor && !isWhileCardOnPile){
+            if(playerDeck.length===2 && !isUnoButtonPressed){
+                forgotUno(player,player, played_card, colorOfPlayedCard,
+                101)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card)
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
+    
+                socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,colorOfPlayedCard,101)
+            }
+        }
+        else{
+            alert("Moviment Invalid!")
+        }
+       
     }
 
+    const pass = (player,turn,played_card) => {
+        const colorOfPlayedCard = played_card.charAt(played_card.length - 1)
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
+        const nextTurn = turn == 'Player 1' ? 'Player 2' : 'Player 1';
+        
+        if(colorOfPlayedCard === currentColor && isWhileCardOnPile){
+
+            if(playerDeck.length===2 && !isUnoButtonPressed){
+                forgotUno(player,player, played_card, colorOfPlayedCard,
+                102)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card)
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
+    
+                socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,colorOfPlayedCard,102)
+            }
+        }
+        //Se não houver carta While, atuará como uma carta "numérica"
+        else if(colorOfPlayedCard === currentColor && !isWhileCardOnPile){
+            if(playerDeck.length===2 && !isUnoButtonPressed){
+                forgotUno(player,nextTurn, played_card, colorOfPlayedCard,
+                102)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card)
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
+    
+                socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,colorOfPlayedCard,102)
+            }
+        }
+        else{
+            alert("Moviment Invalid!")
+        }
+       
+    }
     const forgotUno = (player,turn, played_card, colorOfPlayedCard,numberOfPlayedCard, opponentsDeck=null, modifiedDeck=null, isWhileCardOnPile = false) => {
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
         const removeIndex = playerDeck.indexOf(played_card);

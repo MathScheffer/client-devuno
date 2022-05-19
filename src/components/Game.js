@@ -276,6 +276,41 @@ const Game = (props) => {
                     isWhileCardOnPile: false
                 })
             }
+            else if(colorOfDrawnCard === currentColor && !isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentColor: colorOfDrawnCard,
+                    currentNumber: 101,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                })
+            }
+            else if(colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'PASS_R' || drawCard === 'PASS_G' || drawCard === 'PASS_B' || drawCard === 'PASS_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentNumber: 102,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: true
+                })
+            }
+            else if(colorOfDrawnCard === currentColor && !isWhileCardOnPile && (drawCard === 'PASS_R' || drawCard === 'PASS_G' || drawCard === 'PASS_B' || drawCard === 'PASS_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    turn: 'Player 2',
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentNumber: 102,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                })
+            }
             else if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {
                 console.log("colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'): ",colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'))
                 alert(`You drew ${drawCard}. It was played for you.`)
@@ -448,6 +483,41 @@ const Game = (props) => {
                     playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
                     currentColor: colorOfDrawnCard,
                     currentNumber: 101,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                })
+            }
+            else if(colorOfDrawnCard === currentColor && !isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentColor: colorOfDrawnCard,
+                    currentNumber: 102,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                })
+            }
+            else if(colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'PASS_R' || drawCard === 'PASS_G' || drawCard === 'PASS_B' || drawCard === 'PASS_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentNumber: 102,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: true
+                })
+            }
+            else if(colorOfDrawnCard === currentColor && !isWhileCardOnPile && (drawCard === 'PASS_R' || drawCard === 'PASS_G' || drawCard === 'PASS_B' || drawCard === 'PASS_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    turn: 'Player 1',
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentNumber: 102,
                     drawCardPile: [...copiedDrawCardPileArray],
                     isWhileCardOnPile: false
                 })
