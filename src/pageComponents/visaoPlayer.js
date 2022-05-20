@@ -36,7 +36,7 @@ const VisaoPlayer = ({
         //extract player who played the card
         const cardPlayedBy = turn
         console.log('Turno de quem jogou a carta: ', turn)
-        console.log('Jogou a carta isWhileCardOnPile: ',isWhileCardOnPile)
+        console.log('Jogou a carta "isWhileCardOnPile": ',isWhileCardOnPile)
         switch(played_card) {
             //if card played was a number card
             case '0R': case '1R': case '2R': case '3R': case '4R': case '5R': case '6R': case '7R': case '8R': case '9R': case '_R': case '0G': case '1G': case '2G': case '3G': case '4G': case '5G': case '6G': case '7G': case '8G': case '9G': case '_G': case '0B': case '1B': case '2B': case '3B': case '4B': case '5B': case '6B': case '7B': case '8B': case '9B': case '_B': case '0Y': case '1Y': case '2Y': case '3Y': case '4Y': case '5Y': case '6Y': case '7Y': case '8Y': case '9Y': case '_Y': {
@@ -499,10 +499,8 @@ const VisaoPlayer = ({
         const colorOfPlayedCard = played_card.charAt(played_card.length - 1)
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
         const nextTurn = turn == 'Player 1' ? 'Player 2' : 'Player 1';
-        console.log("colorOfPlayedCard === currentColor && isWhileCardOnPile && (played_card === 'BREAK_R' || played_card === 'BREAK_G' || played_card === 'BREAK_B' || played_card === 'BREAK_Y' : ",(colorOfPlayedCard === currentColor && isWhileCardOnPile && (played_card === 'BREAK_R' || played_card === 'BREAK_G' || played_card === 'BREAK_B' || played_card === 'BREAK_Y')))
+        console.log((currentNumber))
         if(colorOfPlayedCard === currentColor && isWhileCardOnPile){
-            
-
             if(playerDeck.length===2 && !isUnoButtonPressed){
                 forgotUno(player,nextTurn, played_card, colorOfPlayedCard,
                 101)
@@ -514,7 +512,7 @@ const VisaoPlayer = ({
             }
         }
         //Se não houver carta While, atuará como carta break
-        else if(colorOfPlayedCard === currentColor && !isWhileCardOnPile){
+        else if( (colorOfPlayedCard === currentColor || currentNumber == 101 ) && !isWhileCardOnPile){
             if(playerDeck.length===2 && !isUnoButtonPressed){
                 forgotUno(player,player, played_card, colorOfPlayedCard,
                 101)
@@ -535,7 +533,8 @@ const VisaoPlayer = ({
         const colorOfPlayedCard = played_card.charAt(played_card.length - 1)
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
         const nextTurn = turn == 'Player 1' ? 'Player 2' : 'Player 1';
-        
+        console.log((colorOfPlayedCard === currentColor || 102 == currentNumber))
+
         if(colorOfPlayedCard === currentColor && isWhileCardOnPile){
 
             if(playerDeck.length===2 && !isUnoButtonPressed){
@@ -549,7 +548,7 @@ const VisaoPlayer = ({
             }
         }
         //Se não houver carta While, atuará como uma carta "numérica"
-        else if(colorOfPlayedCard === currentColor && !isWhileCardOnPile){
+        else if((colorOfPlayedCard === currentColor || 102 == currentNumber) && !isWhileCardOnPile){
             if(playerDeck.length===2 && !isUnoButtonPressed){
                 forgotUno(player,nextTurn, played_card, colorOfPlayedCard,
                 102)
