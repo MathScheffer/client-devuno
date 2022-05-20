@@ -3,6 +3,9 @@ import useSound from 'use-sound'
 import unoSound from '../assets/sounds/uno-sound.mp3'
 
 import Spinner from '../components/Spinner'
+import useWhileCard from '../customHooks/useWhileCard'
+
+
 const VisaoPlayer = ({
     player,
     turn,
@@ -20,7 +23,9 @@ const VisaoPlayer = ({
     playDraw4CardSound,onCardDrawnHandler,
     socket,
 //transferir para o componente
-    message,messages,setMessage,setMessages
+    message,messages,setMessage,setMessages,
+    lastNumber,
+    isWhileCardOnPile
 }) => {
 
     const [isUnoButtonPressed, setUnoButtonPressed] = useState(false)
@@ -30,25 +35,28 @@ const VisaoPlayer = ({
     const onCardPlayedHandler = (played_card) => {
         //extract player who played the card
         const cardPlayedBy = turn
-        console.log(played_card)
+        console.log('Turno de quem jogou a carta: ', turn)
+        console.log('Jogou a carta "isWhileCardOnPile": ',isWhileCardOnPile)
         switch(played_card) {
             //if card played was a number card
             case '0R': case '1R': case '2R': case '3R': case '4R': case '5R': case '6R': case '7R': case '8R': case '9R': case '_R': case '0G': case '1G': case '2G': case '3G': case '4G': case '5G': case '6G': case '7G': case '8G': case '9G': case '_G': case '0B': case '1B': case '2B': case '3B': case '4B': case '5B': case '6B': case '7B': case '8B': case '9B': case '_B': case '0Y': case '1Y': case '2Y': case '3Y': case '4Y': case '5Y': case '6Y': case '7Y': case '8Y': case '9Y': case '_Y': {
                 //extract number and color of played card
                 const numberOfPlayedCard = played_card.charAt(0)
                 const colorOfPlayedCard = played_card.charAt(1)
-                //check for color match
-                if(currentColor === colorOfPlayedCard) {
+                console.log('Current Number: ',currentNumber)
+                console.log('Current Color: ',currentNumber)
+                if(currentNumber == 100){
+                    if(cardPlayedBy == 'Player 1'){
+                       whileCardLoop('Player 1',played_card,numberOfPlayedCard)
+                    }else{
+                        whileCardLoop('Player 2', played_card, numberOfPlayedCard)
+                    }
+                    
+                }else if(currentColor === colorOfPlayedCard) {
                     console.log('colors matched!')
                     //check who played the card and return new state accordingly
                     if(cardPlayedBy === 'Player 1') {
-                        //remove the played card from player1's deck and add it to playedCardsPile (immutably)
-                        //then update turn, currentColor and currentNumber
-                        const removeIndex = player1Deck.indexOf(played_card)
-                        //if two cards remaining check if player pressed UNO button
-                        //if not pressed add 2 cards as penalty
                         if(player1Deck.length===2 && !isUnoButtonPressed) {
-
                             forgotUno('Player 1','Player 2',played_card,colorOfPlayedCard,numberOfPlayedCard)
                         }
                         else {
@@ -137,7 +145,15 @@ const VisaoPlayer = ({
                 //extract color of played skip card
                 const colorOfPlayedCard = played_card.charAt(4)
                 //check for color match
-                if(currentColor === colorOfPlayedCard) {
+                if(currentNumber == 100){
+                    if(cardPlayedBy == 'Player 1'){
+                       whileCardLoop('Player 1', played_card,404)
+                    }else{
+                        whileCardLoop('Player 2', played_card,404)
+                    }
+                    
+                }
+                else if(currentColor === colorOfPlayedCard) {
                     console.log('colors matched!')
                     //check who played the card and return new state accordingly
                     if(cardPlayedBy === 'Player 1') {
@@ -232,16 +248,23 @@ const VisaoPlayer = ({
                 //extract color of played skip card
                 const colorOfPlayedCard = played_card.charAt(2)
                 //check for color match
-                if(currentColor === colorOfPlayedCard) {
+                if(currentNumber == 100){
+                    if(cardPlayedBy == 'Player 1'){
+                       whileCardLoop('Player 1', played_card, 252 )
+                    }else{
+                        whileCardLoop('Player 2',played_card, 252)
+                    }
+                }
+                else if(currentColor === colorOfPlayedCard) {
                     console.log('colors matched!')
                     //check who played the card and return new state accordingly
                     if(cardPlayedBy === 'Player 1') {
                         const forgotPressUno = player1Deck.length===2 && !isUnoButtonPressed
-                        drag2("Player 1",played_card,colorOfPlayedCard,252,"Player 2", forgotPressUno)
+                        drag2("Player 1",played_card,colorOfPlayedCard,"Player 2", forgotPressUno)
                     }
                     else {
                         const forgotPressUno = player2Deck.length===2 && !isUnoButtonPressed
-                        drag2("Player 2",played_card,colorOfPlayedCard,252,"Player 1", forgotPressUno)
+                        drag2("Player 2",played_card,colorOfPlayedCard,"Player 1", forgotPressUno)
                     }
                 }
                 //check for number match - if draw 2 card played on draw 2 card
@@ -251,12 +274,12 @@ const VisaoPlayer = ({
                     if(cardPlayedBy === 'Player 1') {
 
                         const forgotPressUno = player1Deck.length===2 && !isUnoButtonPressed
-                        drag2("Player 1",played_card,colorOfPlayedCard,252,"Player 2", forgotPressUno)
+                        drag2("Player 1",played_card,colorOfPlayedCard,"Player 2", forgotPressUno)
                     }
                     else {
 
                         const forgotPressUno = player2Deck.length===2 && !isUnoButtonPressed
-                        drag2("Player 2",played_card,colorOfPlayedCard,252,"Player 1", forgotPressUno)
+                        drag2("Player 2",played_card,colorOfPlayedCard,"Player 1", forgotPressUno)
                     }
                 }
                 //if no color or number match, invalid move - do not update state
@@ -268,21 +291,81 @@ const VisaoPlayer = ({
             //if card played was a wild card
             case 'W': {
                 //check who played the card and return new state accordingly
-                if(cardPlayedBy === 'Player 1') {
-                    wildCard('Player 1','Player 2',played_card,
-                     player1Deck.length===2 && !isUnoButtonPressed)
-
+                if(currentNumber == 100){
+                    if(cardPlayedBy == 'Player 1'){
+                       whileCardLoop('Player 1',played_card,300)
+                    }else{
+                        whileCardLoop('Player 2', played_card, 300)
+                    }
+                    
                 }
-                else {
-                    wildCard('Player 2','Player 1',played_card,
-                    player2Deck.length===2 && !isUnoButtonPressed)
+                else{
+                    if(cardPlayedBy === 'Player 1') {
+                        wildCard('Player 1','Player 2',played_card,
+                         player1Deck.length===2 && !isUnoButtonPressed)
+    
+                    }
+                    else {
+                        wildCard('Player 2','Player 1',played_card,
+                        player2Deck.length===2 && !isUnoButtonPressed)
+                    }
+                }
+                
+                break;
+            }
+            case 'WHILE_R': case 'WHILE_G': case 'WHILE_B': case 'WHILE_Y': {
+                const colorOfPlayedCard = played_card.charAt(played_card.length-1)
+                if(currentNumber == 100){
+                    if(cardPlayedBy == 'Player 1'){
+                       whileCardLoop('Player 1',played_card, 100)
+                    }else{
+                        whileCardLoop('Player 2',played_card,100)
+                    }
+                    
+                }
+                else if(currentColor === colorOfPlayedCard){
+                    if(cardPlayedBy === 'Player 1'){
+                        whileCard('Player 1','Player 2',played_card,colorOfPlayedCard,
+                        player1Deck.length===2 && !isUnoButtonPressed)
+                    }else{
+                        whileCard("Player 2",'Player 1',played_card, colorOfPlayedCard,
+                            player1Deck.length===2 && !isUnoButtonPressed)
+                    }
+                }else{
+                    alert('Invalid Move!')
+                }
+
+                break;
+            }
+            case 'BREAK_R': case 'BREAK_G': case 'BREAK_B': case 'BREAK_Y':{
+                if(cardPlayedBy === 'Player 1'){
+                    breakCard('Player 1',turn,played_card)
+                }else{
+                    console.log('WhileCard: ', isWhileCardOnPile)
+                    breakCard('Player 2',turn,played_card)
+                }
+                break;
+            }
+            case 'PASS_R': case 'PASS_G': case 'PASS_B': case 'PASS_Y':{
+                if(cardPlayedBy === 'Player 1'){
+                    pass('Player 1',turn,played_card)
+                }else{
+                    console.log('WhileCard: ', isWhileCardOnPile)
+                    pass('Player 2',turn,played_card)
                 }
                 break;
             }
             //if card played was a draw four wild card
             case 'D4W': {
                 //check who played the card and return new state accordingly
-                if(cardPlayedBy === 'Player 1') {
+                if(currentNumber == 100){
+                    if(cardPlayedBy == 'Player 1'){
+                       whileCardLoop('Player 1', played_card,600)
+                    }else{
+                        whileCardLoop('Player 2', played_card, 600)
+                    }
+                    
+                }else if(cardPlayedBy === 'Player 1') {
                     drag4('Player 1',played_card,'Player 2',player1Deck.length===2 && !isUnoButtonPressed)
                 }
                 else {
@@ -295,7 +378,7 @@ const VisaoPlayer = ({
         }
     }
 
-    const drag2 = (player,played_card,colorOfPlayedCard,numberOfPlayedCard,opponent,isForgotUno=false) => {
+    const drag2 = (player,played_card,colorOfPlayedCard,opponent,isForgotUno=false) => {
         const nextTurn = player == 'Player 1' ? 'Player 2' : 'Player 1'
 
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
@@ -310,7 +393,7 @@ const VisaoPlayer = ({
         opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard1, opponentDrawCard2, ...opponentDeck.slice(opponentDeck.length)]
 
         if(isForgotUno){
-            forgotUno(player,nextTurn,played_card,colorOfPlayedCard,numberOfPlayedCard,
+            forgotUno(player,nextTurn,played_card,colorOfPlayedCard,252,
                 opponentDeck,modifiedDeck)
         }else{
             const removeIndex = playerDeck.indexOf(played_card);
@@ -318,31 +401,7 @@ const VisaoPlayer = ({
                 [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
 
             socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,
-                colorOfPlayedCard,numberOfPlayedCard,modifiedDeck,opponentDeck)
-        }
-    }
-
-    const wildCard = (player,turn,played_card,isForgotUno=false) => {
-       let newColor = prompt('Enter first letter of new color (R/G/B/Y)')
-       if(newColor){
-           console.log(newColor)
-        newColor = newColor.toUpperCase()
-        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
-
-            if(isForgotUno){
-                forgotUno(player,turn,played_card,newColor,300)
-            }else{
-                const removeIndex = playerDeck.indexOf(played_card);
-                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
-
-
-
-                !isSoundMuted && playWildCardSound()
-                socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
-                    newColor,300)
-            }
-        }else{
-            alert("Invalid Color!")
+                colorOfPlayedCard,252,modifiedDeck,opponentDeck)
         }
     }
 
@@ -359,7 +418,7 @@ const VisaoPlayer = ({
         const opponentDrawCard4 = modifiedDeck.pop()      
 
         opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard1, opponentDrawCard2,opponentDrawCard3,opponentDrawCard4, ...opponentDeck.slice(opponentDeck.length)]
-        console.log("Updated Opponent Deck: ",opponentDeck)
+
         if(isForgotUno){
             forgotUno(player,player,played_card,newColor,600,
                 opponentDeck,modifiedDeck)
@@ -368,15 +427,145 @@ const VisaoPlayer = ({
             const removeIndex = playerDeck.indexOf(played_card)
             const updatedPlayerDeck = 
                 [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
-                console.log("updated Player Deck: ",updatedPlayerDeck)
+               
 
             socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
                 newColor,600,modifiedDeck,opponentDeck)
         }
     }
-        
 
-    const forgotUno = (player,turn, played_card, colorOfPlayedCard,numberOfPlayedCard, opponentsDeck=null, modifiedDeck=null) => {
+    const wildCard = (player,turn,played_card,isForgotUno=false) => {
+       let newColor = prompt('Enter first letter of new color (R/G/B/Y)')
+       if(newColor){
+        newColor = newColor.toUpperCase()
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
+
+            if(isForgotUno){
+                forgotUno(player,turn,played_card,newColor,300)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card);
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+
+                !isSoundMuted && playWildCardSound()
+                socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
+                    newColor,300)
+            }
+        }else{
+            alert("Invalid Color!")
+        }
+    }
+        
+    const whileCard = (player,turn,played_card,colorOfPlayedCard,isForgotUno=false) => {
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
+
+        if(isForgotUno){
+            forgotUno(player, turn, played_card, colorOfPlayedCard, 100,null,null,true)
+        }else{
+            const removeIndex = playerDeck.indexOf(played_card)
+            const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+
+        socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
+            colorOfPlayedCard,100,null,null,true)
+        }
+    }
+
+    const whileCardLoop = (player, played_card, numberOfPlayedCard) => {
+    
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
+        const nextTurnIfSuccessfullPlay = player == 'Player 1' ? 'Player 2' : 'Player 1'
+        const colorOfPlayedCard = played_card.charAt(played_card.length - 1)
+        //Verifica se o card jogado contém o mesmo número da última carta numérica presente
+        //na mesa
+        const removeIndex = playerDeck.indexOf(played_card)
+        const updatedPlayerDeck = 
+        [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+
+        if(lastNumber === numberOfPlayedCard){
+            if(playerDeck.length===2 && !isUnoButtonPressed) {
+                    forgotUno(player,nextTurnIfSuccessfullPlay,played_card,colorOfPlayedCard,numberOfPlayedCard, null,null,false)
+            }else{
+                socketEmitUpdateGameState(player,nextTurnIfSuccessfullPlay,played_card,updatedPlayerDeck,
+                    colorOfPlayedCard,numberOfPlayedCard,null,null,false)
+            }
+        }else{
+            alert("Number " + lastNumber + " required!")
+
+            //socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck)
+            console.log('updatedPlayerDeck: ', updatedPlayerDeck)
+        }
+    }
+
+    const breakCard = (player,turn,played_card) => {
+        const colorOfPlayedCard = played_card.charAt(played_card.length - 1)
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
+        const nextTurn = turn == 'Player 1' ? 'Player 2' : 'Player 1';
+        console.log((currentNumber))
+        if(colorOfPlayedCard === currentColor && isWhileCardOnPile){
+            if(playerDeck.length===2 && !isUnoButtonPressed){
+                forgotUno(player,nextTurn, played_card, colorOfPlayedCard,
+                101)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card)
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
+    
+                socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,colorOfPlayedCard,101)
+            }
+        }
+        //Se não houver carta While, atuará como carta break
+        else if( (colorOfPlayedCard === currentColor || currentNumber == 101 ) && !isWhileCardOnPile){
+            if(playerDeck.length===2 && !isUnoButtonPressed){
+                forgotUno(player,player, played_card, colorOfPlayedCard,
+                101)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card)
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
+    
+                socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,colorOfPlayedCard,101)
+            }
+        }
+        else{
+            alert("Moviment Invalid!")
+        }
+       
+    }
+
+    const pass = (player,turn,played_card) => {
+        const colorOfPlayedCard = played_card.charAt(played_card.length - 1)
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
+        const nextTurn = turn == 'Player 1' ? 'Player 2' : 'Player 1';
+        console.log((colorOfPlayedCard === currentColor || 102 == currentNumber))
+
+        if(colorOfPlayedCard === currentColor && isWhileCardOnPile){
+
+            if(playerDeck.length===2 && !isUnoButtonPressed){
+                forgotUno(player,player, played_card, colorOfPlayedCard,
+                102)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card)
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
+    
+                socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,colorOfPlayedCard,102)
+            }
+        }
+        //Se não houver carta While, atuará como uma carta "numérica"
+        else if((colorOfPlayedCard === currentColor || 102 == currentNumber) && !isWhileCardOnPile){
+            if(playerDeck.length===2 && !isUnoButtonPressed){
+                forgotUno(player,nextTurn, played_card, colorOfPlayedCard,
+                102)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card)
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
+    
+                socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,colorOfPlayedCard,102)
+            }
+        }
+        else{
+            alert("Moviment Invalid!")
+        }
+       
+    }
+
+    const forgotUno = (player,turn, played_card, colorOfPlayedCard,numberOfPlayedCard, opponentsDeck=null, modifiedDeck=null, isWhileCardOnPile = false) => {
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
         const removeIndex = playerDeck.indexOf(played_card);
 
@@ -396,9 +585,8 @@ const VisaoPlayer = ({
 
         socketEmitUpdateGameState(player,
             turn,played_card,updatedPlayerDeck, colorOfPlayedCard,numberOfPlayedCard,
-            copiedDrawCardPileArray, opponentsDeck)
+            copiedDrawCardPileArray, opponentsDeck, isWhileCardOnPile)
     }
-
         /**
          * modifiedDrawCardPile -> Caso haja alteração no baralho antes de executar a função
          * oponnentsDeck -> Caso o deck do oponente seja modificado, passar este parâmetro
@@ -410,17 +598,23 @@ const VisaoPlayer = ({
                                         updatedPlayerDeck,
                                         colorOfPlayedCard,
                                         numberOfPlayedCard,
-                                        modifiedDrawCardPile,
-                                        opponentsDeck = null,) => {
+                                        modifiedDrawCardPile = null,
+                                        opponentsDeck = null,
+                                        isWhileCardOnPile = false) => {
 
-        console.log("Socket emit")
-        console.log({
-            player: winner,
-            updatedPlayerDeck: updatedPlayerDeck,
-            opponentsDeck:opponentsDeck
-        })
         let obj = "";
-        
+        const currentColorOfPlayedCard = colorOfPlayedCard ? colorOfPlayedCard : currentColor;
+        const currentNumberOfPlayedCard = numberOfPlayedCard ? numberOfPlayedCard : currentNumber;
+
+        let ln = ''
+        try{
+            ln =( typeof parseInt(currentNumber) == 'number') && (currentNumber < 10 )? currentNumber : lastNumber
+            console.log('Try currentnumber: ',{currentNumber:currentNumber, ln: ln})
+        }catch(message){
+            ln = currentNumber
+            console.log('Catch currentnumber: ',{currentNumber:currentNumber, ln: ln})
+        }
+
         if(winner=='Player 1'){
           obj =  opponentsDeck !== null ? 
             {
@@ -430,18 +624,22 @@ const VisaoPlayer = ({
                 playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), played_card, ...playedCardsPile.slice(playedCardsPile.length)],
                 player1Deck: [...updatedPlayerDeck],
                 player2Deck:[...opponentsDeck],
-                currentColor: colorOfPlayedCard,
-                currentNumber: numberOfPlayedCard,
-                drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile  
+                currentColor: currentColorOfPlayedCard,
+                currentNumber: currentNumberOfPlayedCard,
+                drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile,
+                lastNumber: ln,
+                isWhileCardOnPile: isWhileCardOnPile
             } : {
                 gameOver: checkGameOver(player1Deck),
                 winner: checkWinner(player1Deck, winner),
                 turn: turn,
                 playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), played_card, ...playedCardsPile.slice(playedCardsPile.length)],
                 player1Deck: [...updatedPlayerDeck],
-                currentColor: colorOfPlayedCard,
-                currentNumber: numberOfPlayedCard,
-                drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile
+                currentColor: currentColorOfPlayedCard,
+                currentNumber: currentNumberOfPlayedCard,
+                drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile,
+                lastNumber: ln,
+                isWhileCardOnPile: isWhileCardOnPile
             } 
         }else{
             obj =  opponentsDeck !== null ? {
@@ -451,23 +649,28 @@ const VisaoPlayer = ({
                 playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), played_card, ...playedCardsPile.slice(playedCardsPile.length)],
                 player1Deck: [...opponentsDeck],
                 player2Deck: [...updatedPlayerDeck],
-                currentColor: colorOfPlayedCard,
-                currentNumber: numberOfPlayedCard,
-                drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile
+                currentColor: currentColorOfPlayedCard,
+                currentNumber: currentNumberOfPlayedCard,
+                drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile,
+                lastNumber: ln,
+                isWhileCardOnPile: isWhileCardOnPile
             } : {
                 gameOver: checkGameOver(player2Deck),
                 winner: checkWinner(player2Deck, winner),
                 turn: turn,
                 playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), played_card, ...playedCardsPile.slice(playedCardsPile.length)],
                 player2Deck: [...updatedPlayerDeck],
-                currentColor: colorOfPlayedCard,
-                currentNumber: numberOfPlayedCard,
-                drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile
+                currentColor: currentColorOfPlayedCard,
+                currentNumber: currentNumberOfPlayedCard,
+                drawCardPile: modifiedDrawCardPile != null ? [...modifiedDrawCardPile] : drawCardPile,
+                lastNumber: ln,
+                isWhileCardOnPile: isWhileCardOnPile
             } 
         }
 
         socket.emit('updateGameState', obj)
     }
+
 
     const checkGameOver = (arr) => {
         return arr.length === 1
@@ -499,9 +702,11 @@ const VisaoPlayer = ({
     }
 
     const expectedTurnForSpinner = player == 'Player 1' ? 'Player 2' : 'Player 1'
-    console.log(player,expectedTurnForSpinner )
+    
   return (
+      
       <div>
+          {console.log("visaoPlayer: ",isWhileCardOnPile)}
             <div className={ player == 'Player 1'? 'player2Deck' :'player1Deck'} style={{pointerEvents: 'none'}}>
                 <p className='playerDeckText'>{player == 'Player 1' ? 'Player 2' : 'Player 1'}</p>
                 { player == 'Player 1' && player2Deck.map((item, i) => (
@@ -589,7 +794,6 @@ const VisaoPlayer = ({
                 </div>
             </div> 
       </div>
-  )
-}
+  )}
 
 export default VisaoPlayer
