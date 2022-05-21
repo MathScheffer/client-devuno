@@ -20,7 +20,8 @@ const VisaoPlayer = ({
     playSkipCardSound,
     playDraw2CardSound,
     playWildCardSound,
-    playDraw4CardSound,onCardDrawnHandler,
+    playDraw4CardSound,
+    //onCardDrawnHandler,
     socket,
 //transferir para o componente
     message,messages,setMessage,setMessages,
@@ -67,7 +68,7 @@ const VisaoPlayer = ({
 
                             socketEmitUpdateGameState('Player 1', 'Player 2',
                                 played_card,updatedPlayer1Deck, 
-                                colorOfPlayedCard,numberOfPlayedCard,)
+                                colorOfPlayedCard,numberOfPlayedCard)
                         }
                     }
                     else {
@@ -355,6 +356,13 @@ const VisaoPlayer = ({
                 }
                 break;
             }
+            case 'JOKER_W': {
+                if(cardPlayedBy === 'Player 1'){
+                    jokerCard('Player 1',played_card)
+                }else{
+                    jokerCard('Player 2',played_card)
+                }
+            }
             //if card played was a draw four wild card
             case 'D4W': {
                 //check who played the card and return new state accordingly
@@ -371,8 +379,6 @@ const VisaoPlayer = ({
                 else {
                     drag4('Player 2',played_card,'Player 1',player1Deck.length===2 && !isUnoButtonPressed)
                 }
-
-                
             }
             break;
         }
@@ -563,6 +569,335 @@ const VisaoPlayer = ({
             alert("Moviment Invalid!")
         }
        
+    }
+
+    const jokerCard = (player, played_card) => {
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
+        const nextTurn = turn == 'Player 1' ? 'Player 2' : 'Player 1';
+        
+        let cardWithoutColor = playedCardsPile[playedCardsPile.length - 1]
+        cardWithoutColor = cardWithoutColor.split('_')[0]
+
+        let jokerCardTransform = ''
+        let nextNumber = '';
+
+        if(cardWithoutColor == 'BREAK' || cardWithoutColor == 'PASS' ||
+           cardWithoutColor == 'W' || cardWithoutColor == 'D4W' || 
+           cardWithoutColor.includes('D2')){
+
+            jokerCardTransform = 'JOKER_' + currentColor
+            nextNumber = 700
+
+        }else if(cardWithoutColor[0] >= 0 && cardWithoutColor[0] <= 9){
+
+            jokerCardTransform = `JOKER_${currentNumber}_${currentColor}`
+            nextNumber = currentNumber
+        }
+
+        if(playerDeck.length===2 && !isUnoButtonPressed){
+            forgotUno(player, nextTurn, jokerCardTransform,currentColor,nextNumber)
+        }else{
+            const removeIndex = playerDeck.indexOf(played_card)
+            const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
+
+            socketEmitUpdateGameState(player, turn, jokerCardTransform, updatedPlayerDeck,currentColor,nextNumber)
+        }
+
+    }
+
+    const onCardDrawnHandler = () => {
+        //extract player who drew the card
+        const cardDrawnBy = turn
+        console.log('Turn on top: ', turn)
+        console.log('isWhileCardOnPile on top :',isWhileCardOnPile)
+        //check who drew the card and return new state accordingly
+        
+        if(cardDrawnBy === 'Player 1') {
+            
+            //remove 1 new card from drawCardPile and add it to player1's deck (immutably)
+            //make a copy of drawCardPile array
+            const copiedDrawCardPileArray = [...drawCardPile]
+            //pull out last element from it
+            const drawCard = copiedDrawCardPileArray.pop()
+            //extract number and color of drawn card
+            const colorOfDrawnCard = drawCard.charAt(drawCard.length - 1)
+            let numberOfDrawnCard = drawCard.charAt(0)
+
+            //se o número jogado é igual ao último número e há uma carta 'WHILE' na mesa 
+            console.log('JOGADOR 1: ')
+            console.log("(drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')",(drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y'))
+            console.log("isWhileCardOnPile")
+            console.log("isWhileCardOnPile",isWhileCardOnPile)
+            console.log("currentColor",currentColor)
+            console.log("colorOfDrawnCard", colorOfDrawnCard)
+            
+            if(drawCard == 'JOKER_W') {
+//TODO REFATORAR E COLOCAR ESTA FUNCAO EM VISAOpLAYER                
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+               /*  socket.emit('updateGameState', {
+                    turn: 'Player 2',
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentColor: colorOfDrawnCard,
+                    currentNumber: 101,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                }) */
+            }
+            else if(colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')) {
+                console.log("colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')", colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y'))
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 1','Player 2',drawCard,player1Deck,colorOfDrawnCard,101,copiedDrawCardPileArray )
+            }
+            else if((colorOfDrawnCard === currentColor) && !isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 1','Player 1',drawCard,player1Deck,colorOfDrawnCard,101,copiedDrawCardPileArray)
+            }
+            else if(colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'PASS_R' || drawCard === 'PASS_G' || drawCard === 'PASS_B' || drawCard === 'PASS_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 1','Player 1',drawCard,player1Deck,colorOfDrawnCard,102,copiedDrawCardPileArray,null,true )
+            }
+            else if(colorOfDrawnCard === currentColor && !isWhileCardOnPile && (drawCard === 'PASS_R' || drawCard === 'PASS_G' || drawCard === 'PASS_B' || drawCard === 'PASS_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 1','Player 2',drawCard,player1Deck,colorOfDrawnCard,102,copiedDrawCardPileArray )
+            }
+            else if(numberOfDrawnCard == lastNumber && isWhileCardOnPile){
+                console.log('numberOfDrawnCard == lastNumber && isWhileCardOnPile: ',numberOfDrawnCard == lastNumber && isWhileCardOnPile)
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 1','Player 2',drawCard,player1Deck,colorOfDrawnCard,numberOfDrawnCard,copiedDrawCardPileArray )
+            }
+            //se o número jogado não é igual ao último número da mesa e há uma carta "WHILE"
+            //entao compra e mantem o turno
+            else if(numberOfDrawnCard != lastNumber && isWhileCardOnPile){
+                console.log('numberOfDrawnCard != lastNumber && isWhileCardOnPile',numberOfDrawnCard != lastNumber && isWhileCardOnPile)
+                alert(`You drew ${drawCard}.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    player1Deck: [...player1Deck.slice(0, player1Deck.length), drawCard, ...player1Deck.slice(player1Deck.length)],
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: true
+                })
+
+            }
+            else if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {
+                console.log("colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'): ",colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'))
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 1','Player 1',drawCard,player1Deck,colorOfDrawnCard,404,copiedDrawCardPileArray )
+            }
+            else if(colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y')) {
+                console.log("colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y'): ",colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y'))
+
+                alert(`You drew ${drawCard}. It was played for you.`)
+
+                drag2('Player 1',drawCard,colorOfDrawnCard,'Player 2',false)
+            }
+            else if(drawCard === 'W') {
+                console.log("drawCard === 'W': ",drawCard === 'W')
+                alert(`You drew ${drawCard}. It was played for you.`)
+
+                wildCard('Player 1','Player 2',drawCard, false)
+            }
+            else if(drawCard === 'D4W') {
+                console.log("drawCard === 'W' :",drawCard === 'W')
+                alert(`You drew ${drawCard}. It was played for you.`)
+
+                drag4('Player 1',drawCard,'Player 2',false)
+            }
+            else if((colorOfDrawnCard === currentColor) && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y') ) {
+                console.log("(colorOfDrawnCard === currentColor) && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y') :",(colorOfDrawnCard === currentColor) && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y'))
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                whileCard('Player 1','Player 2',drawCard,colorOfDrawnCard,false)
+            }
+            //if not action card - check if drawn card is playable
+            else if((numberOfDrawnCard == currentNumber || colorOfDrawnCard === currentColor) ) {
+                console.log("(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor) :",(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor) )
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 1','Player 2',drawCard,player1Deck,colorOfDrawnCard,numberOfDrawnCard, copiedDrawCardPileArray)
+            }
+
+            //else add the drawn card to player1's deck
+            else {
+                console.log('just add the drawn card to player1 deck')
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    turn: 'Player 2',
+                    player1Deck: [...player1Deck.slice(0, player1Deck.length), drawCard, ...player1Deck.slice(player1Deck.length)],
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                })
+            }
+        }
+        else {
+            //remove 1 new card from drawCardPile and add it to player2's deck (immutably)
+            //make a copy of drawCardPile array
+            const copiedDrawCardPileArray = [...drawCardPile]
+            //pull out last element from it
+            const drawCard = copiedDrawCardPileArray.pop()
+            //extract number and color of drawn card
+            const colorOfDrawnCard = drawCard.charAt(drawCard.length - 1)
+            let numberOfDrawnCard = drawCard.charAt(0)
+            console.log('JOGADOR 2: ')
+            console.log("(drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')",(drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y'))
+            console.log("isWhileCardOnPile")
+            console.log("isWhileCardOnPile",isWhileCardOnPile)
+            console.log("currentColor",currentColor)
+            console.log("colorOfDrawnCard", colorOfDrawnCard)
+
+            if(colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')) {
+                console.log("colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')", colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y'))
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 2', 'Player 1',drawCard,player2Deck,colorOfDrawnCard,101,copiedDrawCardPileArray)
+            }
+            else if(colorOfDrawnCard === currentColor && !isWhileCardOnPile && (drawCard === 'BREAK_R' || drawCard === 'BREAK_G' || drawCard === 'BREAK_B' || drawCard === 'BREAK_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 2', 'Player 2',drawCard,player2Deck,colorOfDrawnCard,101,copiedDrawCardPileArray)
+            }
+            else if(colorOfDrawnCard === currentColor && isWhileCardOnPile && (drawCard === 'PASS_R' || drawCard === 'PASS_G' || drawCard === 'PASS_B' || drawCard === 'PASS_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 2','Player 2',drawCard,player2Deck,colorOfDrawnCard,102,copiedDrawCardPileArray,null,true)
+            }
+            else if(colorOfDrawnCard === currentColor && !isWhileCardOnPile && (drawCard === 'PASS_R' || drawCard === 'PASS_G' || drawCard === 'PASS_B' || drawCard === 'PASS_Y')) {
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 2','Player 1',drawCard,player2Deck,colorOfDrawnCard,102,copiedDrawCardPileArray)
+            }
+            //se o número jogado é igual ao último número e há uma carta 'WHILE' na mesa 
+            else if(numberOfDrawnCard == lastNumber && isWhileCardOnPile){
+                console.log('numberOfDrawnCard === lastNumber && isWhileCardOnPile: ',numberOfDrawnCard == lastNumber && isWhileCardOnPile)
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+
+                socketEmitUpdateGameState('Player 2','Player 1',drawCard,player2Deck,colorOfDrawnCard,numberOfDrawnCard,copiedDrawCardPileArray)
+               
+            }
+            //se o número jogado não é igual ao último número da mesa e há uma carta "WHILE"
+            //entao compra e mantem o turno
+            else if(numberOfDrawnCard != lastNumber && isWhileCardOnPile){
+                console.log('numberOfDrawnCard != lastNumber && isWhileCardOnPile',numberOfDrawnCard != lastNumber && isWhileCardOnPile)
+                alert(`You drew ${drawCard}.`)
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    player2Deck: [...player2Deck.slice(0, player2Deck.length), drawCard, ...player2Deck.slice(player2Deck.length)],
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: true
+                })
+            }
+
+            else if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {
+                console.log("colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'): ",colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY'))
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 2','Player 2',drawCard,colorOfDrawnCard,404, copiedDrawCardPileArray)
+            }
+            else if(colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y')) {
+                console.log("colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y'): ",colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y'))
+                alert(`You drew ${drawCard}. It was played for you.`)
+                //remove 2 new cards from drawCardPile and add them to player1's deck (immutably)
+                //make a copy of drawCardPile array
+                const copiedDrawCardPileArray = [...drawCardPile]
+                //pull out last two elements from it
+                const drawCard1 = copiedDrawCardPileArray.pop()
+                const drawCard2 = copiedDrawCardPileArray.pop()
+                !isSoundMuted && playDraw2CardSound()
+            
+                const player1Updated = [...player1Deck.slice(0, player1Deck.length), drawCard1, drawCard2, ...player1Deck.slice(player1Deck.length)]
+                socketEmitUpdateGameState('Player 2','Player 2',drawCard,player2Deck,colorOfDrawnCard,252,copiedDrawCardPileArray,player1Updated)
+            }
+            else if(drawCard === 'W') {
+                console.log("drawCard === 'W': ",drawCard === 'W')
+                alert(`You drew ${drawCard}. It was played for you.`)
+                //ask for new color
+                const newColor = prompt('Enter first letter of new color (R/G/B/Y)').toUpperCase()
+                !isSoundMuted && playWildCardSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    turn: 'Player 1',
+                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
+                    currentColor: newColor,
+                    currentNumber: 300,
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                })
+
+                socketEmitUpdateGameState('Player 2','Player 1',drawCard,player2Deck,newColor,300,copiedDrawCardPileArray)
+            }
+            else if(drawCard === 'D4W') {
+                console.log("drawCard === 'D4W'",drawCard === 'D4W')
+                alert(`You drew ${drawCard}. It was played for you.`)
+                //ask for new color
+                const newColor = prompt('Enter first letter of new color (R/G/B/Y)').toUpperCase()
+                //remove 2 new cards from drawCardPile and add them to player1's deck (immutably)
+                //make a copy of drawCardPile array
+                const copiedDrawCardPileArray = [...drawCardPile]
+                //pull out last four elements from it
+                const drawCard1 = copiedDrawCardPileArray.pop()
+                const drawCard2 = copiedDrawCardPileArray.pop()
+                const drawCard3 = copiedDrawCardPileArray.pop()
+                const drawCard4 = copiedDrawCardPileArray.pop()
+                !isSoundMuted && playDraw4CardSound()
+
+                const player1Updated = [...player1Deck.slice(0, player1Deck.length), drawCard1, drawCard2, drawCard3, drawCard4, ...player1Deck.slice(player1Deck.length)]
+                socketEmitUpdateGameState('Player 2','Player 2',drawCard,player2Deck,newColor,600,copiedDrawCardPileArray,player1Updated)
+            }
+            else if(colorOfDrawnCard === currentColor && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y') ) {
+                console.log("(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor): ",(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor))
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 2','Player 1',drawCard,player2Deck,colorOfDrawnCard,numberOfDrawnCard,copiedDrawCardPileArray,null,true)
+            }
+            //if not action card - check if drawn card is playable
+            else if((numberOfDrawnCard == currentNumber || colorOfDrawnCard === currentColor)) {
+                console.log("(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor): ",(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor))
+                alert(`You drew ${drawCard}. It was played for you.`)
+                !isSoundMuted && playShufflingSound()
+
+                socketEmitUpdateGameState('Player 2','Player 1',drawCard,player2Deck,colorOfDrawnCard,numberOfDrawnCard,copiedDrawCardPileArray,null,drawCard.includes('WHILE'))
+            }
+
+            
+            //else add the drawn card to player2's deck
+            else {
+                console.log('just add the drawn card to player 2 deck')
+                !isSoundMuted && playShufflingSound()
+                //send new state to server
+                socket.emit('updateGameState', {
+                    turn: 'Player 1',
+                    player2Deck: [...player2Deck.slice(0, player2Deck.length), drawCard, ...player2Deck.slice(player2Deck.length)],
+                    drawCardPile: [...copiedDrawCardPileArray],
+                    isWhileCardOnPile: false
+                })
+            }
+        }
     }
 
     const forgotUno = (player,turn, played_card, colorOfPlayedCard,numberOfPlayedCard, opponentsDeck=null, modifiedDeck=null, isWhileCardOnPile = false) => {
