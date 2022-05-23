@@ -336,6 +336,30 @@ const VisaoPlayer = ({
 
                 break;
             }
+            case 'IF_R': case 'IF_G': case 'IF_B': case 'IF_Y': {
+                const colorOfPlayedCard = played_card.charAt(played_card.length-1)
+                if(currentNumber == 100){
+                    if(cardPlayedBy == 'Player 1'){
+                        whileCardLoop('Player 1',played_card, 100)
+                    }else{
+                        whileCardLoop('Player 2',played_card,100)
+                    }
+                    
+                }
+                else if(currentColor === colorOfPlayedCard){
+                    if(cardPlayedBy === 'Player 1'){
+                        ifCard('Player 1',played_card,colorOfPlayedCard,'Player 2',currentNumber,
+                        player1Deck.length===2 && !isUnoButtonPressed)
+                    }else{
+                        ifCard("Player 2",played_card, colorOfPlayedCard,'Player 1',currentNumber,
+                            player1Deck.length===2 && !isUnoButtonPressed)
+                    }
+                }else{
+                    alert('Invalid Move!')
+                }
+
+                break;
+            }
             //if card played was a draw four wild card
             case 'D4W': {
                 //check who played the card and return new state accordingly
@@ -474,6 +498,87 @@ const VisaoPlayer = ({
             console.log('updatedPlayerDeck: ', updatedPlayerDeck)
         }
     }
+
+    const ifCard = (player,played_card,colorOfPlayedCard,opponent,boardNumber,isForgotUno=false) => {
+        const nextTurn = player == 'Player 1' ? 'Player 2' : 'Player 1'
+
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
+        
+        let opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
+        
+        // se o oponente tiver uma carta com numero igual a boardnumber,
+        // o oponente pode jogar o card
+        const opponentHasCard = opponentDeck.find(card => card.charAt(card.length - 1) === boardNumber)
+        console.log("OPONENT HAS CARD: "+opponentHasCard)
+        console.log("BOARD NUMBER: "+boardNumber)
+        if(opponentHasCard){
+            const modifiedDeck = [...drawCardPile]
+            const opponentDrawCard = modifiedDeck.pop()
+
+            const removeIndex = playerDeck.indexOf(played_card)
+            const updatedPlayerDeck = 
+                [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+            opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard, ...opponentDeck.slice(opponentDeck.length)]
+
+            socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
+                    colorOfPlayedCard,200,modifiedDeck,opponentDeck)
+            // if(isForgotUno){
+            //     forgotUno(player,player,played_card,newColor,600,
+            //         opponentDeck,modifiedDeck)
+            // }else{
+                
+            //     const removeIndex = playerDeck.indexOf(played_card)
+            //     const updatedPlayerDeck = 
+            //         [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+                   
+    
+            //     socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
+            //         newColor,600,modifiedDeck,opponentDeck)
+            // }
+        }else{
+            alert("Opponent doesn't have a card with number " + boardNumber)
+
+            if(isForgotUno){
+                forgotUno(player, turn, played_card, colorOfPlayedCard, 200,null,null,true)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card)
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+
+                console.log("começa o loop para o ifCard")
+                for (let index = 1; index <= boardNumber; index++) {
+                    console.log(index)
+                    const modifiedDeck = [...drawCardPile]
+                    const opponentDrawCard = modifiedDeck.pop()
+                    opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard, ...opponentDeck.slice(opponentDeck.length)]
+                }
+    
+                socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
+                    colorOfPlayedCard,200,null,null,true)
+            }
+            // como o oponente não tem carta com o mesmo número, o oponente compra o numero de cartas igual ao numero do boardnumber
+        }
+    }
+    /*
+        const modifiedDeck = [...drawCardPile]
+
+        const opponentDrawCard1 = modifiedDeck.pop()
+        const opponentDrawCard2 = modifiedDeck.pop()
+
+        opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard1, opponentDrawCard2, ...opponentDeck.slice(opponentDeck.length)]
+
+        if(isForgotUno){
+            forgotUno(player,nextTurn,played_card,colorOfPlayedCard,252,
+                opponentDeck,modifiedDeck)
+        }else{
+            const removeIndex = playerDeck.indexOf(played_card);
+            const updatedPlayerDeck = 
+                [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+
+            socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,
+                colorOfPlayedCard,200,modifiedDeck,opponentDeck)
+        }
+    }
+    */
 
     const forgotUno = (player,turn, played_card, colorOfPlayedCard,numberOfPlayedCard, opponentsDeck=null, modifiedDeck=null, isWhileCardOnPile = false) => {
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
