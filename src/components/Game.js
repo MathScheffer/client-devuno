@@ -118,7 +118,9 @@ const Game = (props) => {
             shuffledCards[startingCardIndex]==='WHILE_R'  || shuffledCards[startingCardIndex]==='WHILE_G' || 
             shuffledCards[startingCardIndex]==='WHILE_B'  || shuffledCards[startingCardIndex]==='WHILE_Y' ||
             shuffledCards[startingCardIndex]==='BREAK_R'  || shuffledCards[startingCardIndex]==='BREAK_G' || 
-            shuffledCards[startingCardIndex]==='BREAK_B'  || shuffledCards[startingCardIndex]==='BREAK_Y'
+            shuffledCards[startingCardIndex]==='BREAK_B'  || shuffledCards[startingCardIndex]==='BREAK_Y' ||
+            shuffledCards[startingCardIndex]==='PASS_R'   || shuffledCards[startingCardIndex]==='PASS_G'  || 
+            shuffledCards[startingCardIndex]==='PASS_B'   || shuffledCards[startingCardIndex]==='PASS_Y'  
             
             ) {
                 continue;
@@ -139,7 +141,7 @@ const Game = (props) => {
             turn: 'Player 1',
             player1Deck: [...player1Deck],
             player2Deck: [...player2Deck],
-            currentColor: playedCardsPile[0].charAt(1),
+            currentColor: playedCardsPile[0].charAt([playedCardsPile[0].length - 1]),
             currentNumber: playedCardsPile[0].charAt(0),
             playedCardsPile: [...playedCardsPile],
             drawCardPile: [...drawCardPile],
