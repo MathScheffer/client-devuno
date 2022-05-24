@@ -500,6 +500,10 @@ const VisaoPlayer = ({
     }
 
     const ifCard = (player,played_card,colorOfPlayedCard,opponent,boardNumber,isForgotUno=false) => {
+        if (boardNumber > 9 || boardNumber < 1) {
+            alert("Não é possivel jogar o IF em cartas especiais ou em um zero!");
+            return;
+        }
         const nextTurn = player == 'Player 1' ? 'Player 2' : 'Player 1'
 
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
@@ -508,9 +512,12 @@ const VisaoPlayer = ({
         
         // se o oponente tiver uma carta com numero igual a boardnumber,
         // o oponente pode jogar o card
-        const opponentHasCard = opponentDeck.find(card => card.charAt(card.length - 1) === boardNumber)
+        const opponentHasCard = opponentDeck.find(card => card === played_card)
+        console.log("PLAYED CARD: ", played_card)
         console.log("OPONENT HAS CARD: "+opponentHasCard)
         console.log("BOARD NUMBER: "+boardNumber)
+        console.log("DECK OPONENTE: ", opponentDeck)
+        
         if(opponentHasCard){
             const modifiedDeck = [...drawCardPile]
             const opponentDrawCard = modifiedDeck.pop()
@@ -522,63 +529,28 @@ const VisaoPlayer = ({
 
             socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
                     colorOfPlayedCard,200,modifiedDeck,opponentDeck)
-            // if(isForgotUno){
-            //     forgotUno(player,player,played_card,newColor,600,
-            //         opponentDeck,modifiedDeck)
-            // }else{
-                
-            //     const removeIndex = playerDeck.indexOf(played_card)
-            //     const updatedPlayerDeck = 
-            //         [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
-                   
-    
-            //     socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
-            //         newColor,600,modifiedDeck,opponentDeck)
-            // }
         }else{
             alert("Opponent doesn't have a card with number " + boardNumber)
 
             if(isForgotUno){
                 forgotUno(player, turn, played_card, colorOfPlayedCard, 200,null,null,true)
             }else{
-                const removeIndex = playerDeck.indexOf(played_card)
-                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
-
+                const modifiedDeck = [...drawCardPile]
                 console.log("começa o loop para o ifCard")
-                for (let index = 1; index <= boardNumber; index++) {
-                    console.log(index)
-                    const modifiedDeck = [...drawCardPile]
+                for (let index = 1; index <= boardNumber; index++) {                    
                     const opponentDrawCard = modifiedDeck.pop()
+
                     opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard, ...opponentDeck.slice(opponentDeck.length)]
                 }
-    
-                socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
-                    colorOfPlayedCard,200,null,null,true)
+                const removeIndex = playerDeck.indexOf(played_card);
+                const updatedPlayerDeck = 
+                    [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+
+                socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,
+                    colorOfPlayedCard,252,modifiedDeck,opponentDeck)
             }
-            // como o oponente não tem carta com o mesmo número, o oponente compra o numero de cartas igual ao numero do boardnumber
         }
     }
-    /*
-        const modifiedDeck = [...drawCardPile]
-
-        const opponentDrawCard1 = modifiedDeck.pop()
-        const opponentDrawCard2 = modifiedDeck.pop()
-
-        opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard1, opponentDrawCard2, ...opponentDeck.slice(opponentDeck.length)]
-
-        if(isForgotUno){
-            forgotUno(player,nextTurn,played_card,colorOfPlayedCard,252,
-                opponentDeck,modifiedDeck)
-        }else{
-            const removeIndex = playerDeck.indexOf(played_card);
-            const updatedPlayerDeck = 
-                [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
-
-            socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,
-                colorOfPlayedCard,200,modifiedDeck,opponentDeck)
-        }
-    }
-    */
 
     const forgotUno = (player,turn, played_card, colorOfPlayedCard,numberOfPlayedCard, opponentsDeck=null, modifiedDeck=null, isWhileCardOnPile = false) => {
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck;
