@@ -7,5 +7,7 @@ export default [
     'W', 'W', 'W', 'W', 'D4W', 'D4W', 'D4W', 'D4W',
     'WHILE_R','WHILE_G','WHILE_B','WHILE_Y',
     'BREAK_R','BREAK_R','BREAK_R','BREAK_G','BREAK_G','BREAK_G','BREAK_B','BREAK_B','BREAK_B','BREAK_Y','BREAK_Y','BREAK_Y',
-    'PASS_R','PASS_R','PASS_G','PASS_G','PASS_B','PASS_B','PASS_Y','PASS_Y'
+    'PASS_R','PASS_R','PASS_G','PASS_G','PASS_B','PASS_B','PASS_Y','PASS_Y',
+    'JOKER_W','JOKER_W','JOKER_W','JOKER_W'
+    ,'JOKER_W','JOKER_W','JOKER_W','JOKER_W'
 ]
