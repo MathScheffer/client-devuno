@@ -6,6 +6,7 @@ import queryString from 'query-string'
 import Spinner from './Spinner'
 import VisaoPlayer from '../pageComponents/visaoPlayer'
 import useSound from 'use-sound'
+import devunoWhite from '../assets/devuno/devuno_logo_white.png'
 
 import bgMusic from '../assets/sounds/game-bg-music.mp3'
 import unoSound from '../assets/sounds/uno-sound.mp3'
@@ -657,11 +658,11 @@ const Game = (props) => {
             {(!roomFull) ? <>
 
                 <div className='topInfo'>
-                    <img src={require('../assets/logo.png').default} />
+                    <img src={devunoWhite} />
                     <h1>Game Code: {room}</h1>
                     <span>
-                        <button className='game-button green' onClick={() => setSoundMuted(!isSoundMuted)}>{isSoundMuted ? <span className="material-icons">volume_off</span> : <span className="material-icons">volume_up</span>}</button>
-                        <button className='game-button green' onClick={() => {
+                        <button className='game-button-sound' onClick={() => setSoundMuted(!isSoundMuted)}>{isSoundMuted ? <span className="material-icons">volume_off</span> : <span className="material-icons">volume_up</span>}</button>
+                        <button className='game-button-sound' onClick={() => {
                             if(isMusicMuted)
                                 playBBgMusic()
                             else
@@ -741,7 +742,7 @@ const Game = (props) => {
             </> : <h1>Room full</h1> }
 
             <br />
-            <a href='/'><button className="game-button red">QUIT</button></a>
+            <a href='/'><button className="game-button-quit">QUIT</button></a>
         </div>
     )
 }
