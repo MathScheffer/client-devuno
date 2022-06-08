@@ -27,7 +27,6 @@ import { waitFor } from '@testing-library/react'
 //BREAK - 101
 //PASS - 102
 //JOKER - 700
-//IF - 200
 
 let socket
 // const ENDPOINT = 'http://localhost:5000'

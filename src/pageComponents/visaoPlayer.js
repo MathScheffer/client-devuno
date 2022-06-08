@@ -339,30 +339,6 @@ const VisaoPlayer = ({
 
                 break;
             }
-            case 'IF_R': case 'IF_G': case 'IF_B': case 'IF_Y': {
-                const colorOfPlayedCard = played_card.charAt(played_card.length-1)
-                if(currentNumber == 100){
-                    if(cardPlayedBy == 'Player 1'){
-                        whileCardLoop('Player 1',played_card, 100)
-                    }else{
-                        whileCardLoop('Player 2',played_card,100)
-                    }
-                    
-                }
-                else if(currentColor === colorOfPlayedCard){
-                    if(cardPlayedBy === 'Player 1'){
-                        ifCard('Player 1',played_card,colorOfPlayedCard,'Player 2',currentNumber,
-                        player1Deck.length===2 && !isUnoButtonPressed)
-                    }else{
-                        ifCard("Player 2",played_card, colorOfPlayedCard,'Player 1',currentNumber,
-                            player1Deck.length===2 && !isUnoButtonPressed)
-                    }
-                }else{
-                    alert('Invalid Move!')
-                }
-
-                break;
-            }
             case 'BREAK_R': case 'BREAK_G': case 'BREAK_B': case 'BREAK_Y':{
                 if(cardPlayedBy === 'Player 1'){
                     breakCard('Player 1',turn,played_card)
@@ -498,59 +474,6 @@ const VisaoPlayer = ({
 
         socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
             colorOfPlayedCard,100,null,null,true)
-        }
-    }
-
-    const ifCard = (player,played_card,colorOfPlayedCard,opponent,boardNumber,isForgotUno=false) => {
-        if (boardNumber > 9 || boardNumber < 1) {
-            alert("Não é possivel jogar o IF em cartas especiais ou em um zero!");
-            return;
-        }
-        const nextTurn = player == 'Player 1' ? 'Player 2' : 'Player 1'
-
-        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
-        
-        let opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
-        
-        // se o oponente tiver uma carta com numero igual a boardnumber,
-        // o oponente pode jogar o card
-        const opponentHasCard = opponentDeck.find(card => card === played_card)
-        console.log("PLAYED CARD: ", played_card)
-        console.log("OPONENT HAS CARD: "+opponentHasCard)
-        console.log("BOARD NUMBER: "+boardNumber)
-        console.log("DECK OPONENTE: ", opponentDeck)
-        
-        if(opponentHasCard){
-            const modifiedDeck = [...drawCardPile]
-            const opponentDrawCard = modifiedDeck.pop()
-
-            const removeIndex = playerDeck.indexOf(played_card)
-            const updatedPlayerDeck = 
-                [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
-            opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard, ...opponentDeck.slice(opponentDeck.length)]
-
-            socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
-                    colorOfPlayedCard,200,modifiedDeck,opponentDeck)
-        }else{
-            alert("Opponent doesn't have a card with number " + boardNumber)
-
-            if(isForgotUno){
-                forgotUno(player, turn, played_card, colorOfPlayedCard, 200,null,null,true)
-            }else{
-                const modifiedDeck = [...drawCardPile]
-                console.log("começa o loop para o ifCard")
-                for (let index = 1; index <= boardNumber; index++) {                    
-                    const opponentDrawCard = modifiedDeck.pop()
-
-                    opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard, ...opponentDeck.slice(opponentDeck.length)]
-                }
-                const removeIndex = playerDeck.indexOf(played_card);
-                const updatedPlayerDeck = 
-                    [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
-
-                socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,
-                    colorOfPlayedCard,252,modifiedDeck,opponentDeck)
-            }
         }
     }
 
