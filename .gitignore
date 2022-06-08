@@ -1,0 +1,12 @@
+﻿/node_modules
+node_modules
+node_modules/
+.vscode/
+*/node_modules/* 
+**/node_modules
+\node_modules
+\node_modules\
+**\node_modules
+*\node_modules\*
+qcl
+yarn.lock
