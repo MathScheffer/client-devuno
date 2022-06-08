@@ -147,7 +147,6 @@ const Game = (props) => {
     useEffect(() => {
 
         socket.on('initGameState', ({ gameOver, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber, isWhileCardOnPile }) => {
-            
             setGameOver(gameOver)
             setTurn(turn)
             setPlayer1Deck(player1Deck)
@@ -164,11 +163,7 @@ const Game = (props) => {
             console.log("While card conf init: ",whileCardConf) */
         })
 
-        socket.on('updateGameState', ({ gameOver, winner, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber, isWhileCardOnPile = false}) => {
-            
-            const booleanWhieldCard = isWhileCardOnPile !== undefined ? isWhileCardOnPile : false
-//            const verifiedLastNumber = lastNumber !== undefined ? lastNumber : 
-
+        socket.on('updateGameState', ({ gameOver, winner, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber, isWhileCardOnPile }) => {
             gameOver && setGameOver(gameOver)
             gameOver===true && playGameOverSound()
             winner && setWinner(winner)
@@ -180,9 +175,8 @@ const Game = (props) => {
             playedCardsPile && setPlayedCardsPile(playedCardsPile)
             drawCardPile && setDrawCardPile(drawCardPile)
            // whileCardConf && setWhileCardConf(whileCardConf)
-            
             lastNumber && setLastNumber(lastNumber)
-            setIsWhileCardOnPile(booleanWhieldCard)
+            isWhileCardOnPile && setIsWhileCardOnPile(isWhileCardOnPile)
             //console.log("While card conf update: ",whileCardConf)
             console.log("Current number update: ",currentNumber)
             console.log("Last number conf update: ",lastNumber)
@@ -231,7 +225,7 @@ const Game = (props) => {
             console.log('drawCard: ',drawCard)
             
             
-            console.log('DrawCardPile: ',drawCardPile.length)
+            console.log('DrawCardPile: ',drawCardPile)
             
             
             if(numberOfDrawnCard == lastNumber && isWhileCardOnPile){
@@ -247,6 +241,10 @@ const Game = (props) => {
                     drawCardPile: [...copiedDrawCardPileArray],
                     isWhileCardOnPile: false
                 })
+                setTimeout(function(){
+                    console.log('Setou isWhileCardOnPile: ',isWhileCardOnPile)
+                    console.log('Turn: ',turn)
+                }, 4000);
             }
             //se o número jogado não é igual ao último número da mesa e há uma carta "WHILE"
             //entao compra e mantem o turno
@@ -256,9 +254,9 @@ const Game = (props) => {
                 !isSoundMuted && playShufflingSound()
                 //send new state to server
                 socket.emit('updateGameState', {
+                    turn: 'Player 1',
                     player1Deck: [...player1Deck.slice(0, player1Deck.length), drawCard, ...player1Deck.slice(player1Deck.length)],
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: true
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
             else if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {
@@ -270,8 +268,7 @@ const Game = (props) => {
                     playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
                     currentColor: colorOfDrawnCard,
                     currentNumber: 404,
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: false
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
             else if(colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y')) {
@@ -291,8 +288,7 @@ const Game = (props) => {
                     player2Deck: [...player2Deck.slice(0, player2Deck.length), drawCard1, drawCard2, ...player2Deck.slice(player2Deck.length)],
                     currentColor: colorOfDrawnCard,
                     currentNumber: 252,
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile:false
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
             else if(drawCard === 'W') {
@@ -307,8 +303,7 @@ const Game = (props) => {
                     playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
                     currentColor: newColor,
                     currentNumber: 300,
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile:false
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
             else if(drawCard === 'D4W') {
@@ -331,8 +326,7 @@ const Game = (props) => {
                     player2Deck: [...player2Deck.slice(0, player2Deck.length), drawCard1, drawCard2, drawCard3, drawCard4, ...player2Deck.slice(player2Deck.length)],
                     currentColor: newColor,
                     currentNumber: 600,
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile:false
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
             //if not action card - check if drawn card is playable
@@ -347,21 +341,7 @@ const Game = (props) => {
                     currentColor: colorOfDrawnCard,
                     currentNumber: numberOfDrawnCard,
                     drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: false
-                })
-                console.log('Setou isWhileCardOnPile: ', isWhileCardOnPile)
-            }else if((colorOfDrawnCard === currentColor) && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y') ) {
-                console.log("(colorOfDrawnCard === currentColor) && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y') :",(colorOfDrawnCard === currentColor) && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y'))
-                alert(`You drew ${drawCard}. It was played for you.`)
-                !isSoundMuted && playShufflingSound()
-                console.log('isWhileCardOnPile: ',drawCard.includes('WHILE') )
-                socket.emit('updateGameState', {
-                    turn: 'Player 2',
-                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
-                    currentColor: colorOfDrawnCard,
-                    currentNumber: numberOfDrawnCard,
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: true
+                    isWhileCardOnPile: drawCard.includes('WHILE')
                 })
                 console.log('Setou isWhileCardOnPile: ', isWhileCardOnPile)
             }
@@ -373,8 +353,7 @@ const Game = (props) => {
                 socket.emit('updateGameState', {
                     turn: 'Player 2',
                     player1Deck: [...player1Deck.slice(0, player1Deck.length), drawCard, ...player1Deck.slice(player1Deck.length)],
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: false
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
         }
@@ -408,6 +387,10 @@ const Game = (props) => {
                     drawCardPile: [...copiedDrawCardPileArray],
                     isWhileCardOnPile: false
                 })
+                setTimeout(function(){
+                    console.log('Setou isWhileCardOnPile: ',isWhileCardOnPile)
+                    console.log('Turn: ',turn)
+                }, 4000);
                
             }
             //se o número jogado não é igual ao último número da mesa e há uma carta "WHILE"
@@ -419,8 +402,7 @@ const Game = (props) => {
                 //send new state to server
                 socket.emit('updateGameState', {
                     player2Deck: [...player2Deck.slice(0, player2Deck.length), drawCard, ...player2Deck.slice(player2Deck.length)],
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: true
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
             else if(colorOfDrawnCard === currentColor && (drawCard === 'skipR' || drawCard === 'skipG' || drawCard === 'skipB' || drawCard === 'skipY')) {
@@ -432,8 +414,7 @@ const Game = (props) => {
                     playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
                     currentColor: colorOfDrawnCard,
                     currentNumber: 404,
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: false
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
             else if(colorOfDrawnCard === currentColor && (drawCard === 'D2R' || drawCard === 'D2G' || drawCard === 'D2B' || drawCard === 'D2Y')) {
@@ -452,8 +433,7 @@ const Game = (props) => {
                     player1Deck: [...player1Deck.slice(0, player1Deck.length), drawCard1, drawCard2, ...player1Deck.slice(player1Deck.length)],
                     currentColor: colorOfDrawnCard,
                     currentNumber: 252,
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: false
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
             else if(drawCard === 'W') {
@@ -468,8 +448,7 @@ const Game = (props) => {
                     playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
                     currentColor: newColor,
                     currentNumber: 300,
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: false
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
             else if(drawCard === 'D4W') {
@@ -492,8 +471,7 @@ const Game = (props) => {
                     player1Deck: [...player1Deck.slice(0, player1Deck.length), drawCard1, drawCard2, drawCard3, drawCard4, ...player1Deck.slice(player1Deck.length)],
                     currentColor: newColor,
                     currentNumber: 600,
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: false
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
             //if not action card - check if drawn card is playable
@@ -514,23 +492,7 @@ const Game = (props) => {
                 console.log('Setou isWhileCardOnPile: ',isWhileCardOnPile)
 
             }
-            else if(colorOfDrawnCard === currentColor && (drawCard === 'WHILE_R' || drawCard === 'WHILE_G' || drawCard === 'WHILE_B' || drawCard === 'WHILE_Y') ) {
-                console.log("(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor): ",(numberOfDrawnCard === currentNumber || colorOfDrawnCard === currentColor))
-                alert(`You drew ${drawCard}. It was played for you.`)
-                !isSoundMuted && playShufflingSound()
-                console.log('isWhileCardOnPile: ',drawCard.includes('WHILE') )
-                //send new state to server
-                socket.emit('updateGameState', {
-                    turn: 'Player 1',
-                    playedCardsPile: [...playedCardsPile.slice(0, playedCardsPile.length), drawCard, ...playedCardsPile.slice(playedCardsPile.length)],
-                    currentColor: colorOfDrawnCard,
-                    currentNumber: numberOfDrawnCard,
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: true
-                })
-                console.log('Setou isWhileCardOnPile: ',isWhileCardOnPile)
-
-            }
+           
             
             //else add the drawn card to player2's deck
             else {
@@ -540,8 +502,7 @@ const Game = (props) => {
                 socket.emit('updateGameState', {
                     turn: 'Player 1',
                     player2Deck: [...player2Deck.slice(0, player2Deck.length), drawCard, ...player2Deck.slice(player2Deck.length)],
-                    drawCardPile: [...copiedDrawCardPileArray],
-                    isWhileCardOnPile: false
+                    drawCardPile: [...copiedDrawCardPileArray]
                 })
             }
         }
@@ -549,7 +510,6 @@ const Game = (props) => {
 
     return (
         <div className={`Game backgroundColorR backgroundColor${currentColor}`}>
-                {console.log("GameJS: ",isWhileCardOnPile)}
             {(!roomFull) ? <>
 
                 <div className='topInfo'>

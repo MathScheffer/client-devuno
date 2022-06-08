@@ -43,6 +43,7 @@ const VisaoPlayer = ({
                 //extract number and color of played card
                 const numberOfPlayedCard = played_card.charAt(0)
                 const colorOfPlayedCard = played_card.charAt(1)
+                //socket.emit('updateGameState',{lastNumber: currentNumber})
 
                 if(currentNumber == 100){
                     if(cardPlayedBy == 'Player 1'){
@@ -696,9 +697,7 @@ const VisaoPlayer = ({
     const expectedTurnForSpinner = player == 'Player 1' ? 'Player 2' : 'Player 1'
     
   return (
-      
       <div>
-          {console.log("visaoPlayer: ",isWhileCardOnPile)}
             <div className={ player == 'Player 1'? 'player2Deck' :'player1Deck'} style={{pointerEvents: 'none'}}>
                 <p className='playerDeckText'>{player == 'Player 1' ? 'Player 2' : 'Player 1'}</p>
                 { player == 'Player 1' && player2Deck.map((item, i) => (
