@@ -8,8 +8,7 @@ const Homepage = () => {
 
     return (
         <div className='Homepage'>
-            <div className='homepage-black'> 
-            <div className='homepage-menu'>
+        
            
                 <div className='homepage-form'>     
                 <img src={devunoWhite} className='homepage-logo' alt='logotipo'/>
@@ -24,8 +23,7 @@ const Homepage = () => {
                     </div>
                 </div>
             </div>
-            </div>
-        </div>
+        
     )
 }
 
