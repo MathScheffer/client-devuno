@@ -1052,9 +1052,7 @@ const VisaoPlayer = ({
     const expectedTurnForSpinner = player == 'Player 1' ? 'Player 2' : 'Player 1'
     
   return (
-      
       <div>
-          {console.log("visaoPlayer: ",isWhileCardOnPile)}
             <div className={ player == 'Player 1'? 'player2Deck' :'player1Deck'} style={{pointerEvents: 'none'}}>
                 <p className='playerDeckText'>{player == 'Player 1' ? 'Player 2' : 'Player 1'}</p>
                 { player == 'Player 1' && player2Deck.map((item, i) => (
@@ -1077,14 +1075,18 @@ const VisaoPlayer = ({
             </div>
             <br />
             <div className='middleInfo' style={turn === expectedTurnForSpinner ? {pointerEvents: 'none'} : null}>
-                <button className='game-button' disabled={turn !== player} onClick={onCardDrawnHandler}>DRAW CARD</button>
+                <button className='button-baralho' disabled={turn !== player} onClick={onCardDrawnHandler}> 
+                <div class='red-circle'> 
+                DRAW CARD
+                </div>
+                </button>
                 {playedCardsPile && playedCardsPile.length>0 &&
                 <img
                     className='Card'
                     src={require(`../assets/cards-front/${playedCardsPile[playedCardsPile.length-1]}.png`).default}
                     /> }
                 {turn == 'Player 1' &&
-                    <button className='game-button orange' disabled={player1Deck.length !== 2} onClick={() => {
+                    <button className='button-uno' disabled={player1Deck.length !== 2} onClick={() => {
                         setUnoButtonPressed(!isUnoButtonPressed)
                         playUnoSound()
                     }}>UNO</button>
