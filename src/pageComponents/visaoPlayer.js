@@ -602,7 +602,7 @@ const VisaoPlayer = ({
         console.log(`nextNumber: ${nextNumber}`)
 
         if(updatedDrawCardPile){
-            socketEmitUpdateGameState(player,nextNumber,jokerCardTransform,playerDeck,currentColor,nextNumber,updatedDrawCardPile )
+            socketEmitUpdateGameState(player,nextNumber,jokerCardTransform,playerDeck,currentColor,nextNumber,updatedDrawCardPile,null,false)
 
         }else if(playerDeck.length===2 && !isUnoButtonPressed && nextNumber != '' && jokerCardTransform != ''){
 
@@ -611,7 +611,7 @@ const VisaoPlayer = ({
             const removeIndex = playerDeck.indexOf('JOKER_W')
             const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
 
-            socketEmitUpdateGameState(player, turn, jokerCardTransform, updatedPlayerDeck,currentColor,nextNumber)
+            socketEmitUpdateGameState(player, turn, jokerCardTransform, updatedPlayerDeck,currentColor,nextNumber,null,null,false)
         }else{
             alert('Invalid move!')
         }
