@@ -365,6 +365,14 @@ const VisaoPlayer = ({
                 }
                 break;
             }
+            case 'IF_R': case 'IF_G': case 'IF_B': case 'IF_Y':{
+                if(cardPlayedBy === 'Player 1'){
+                    ifCard('Player 1',turn,played_card)
+                }else{
+                    ifCard('Player 2',turn,played_card)
+                }
+                break;
+            }
             //if card played was a draw four wild card
             case 'D4W': {
                 //check who played the card and return new state accordingly
@@ -439,6 +447,71 @@ const VisaoPlayer = ({
 
             socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
                 newColor,600,modifiedDeck,opponentDeck)
+        }
+    }
+
+    const opponentHasCardIfCard = (playerDeck,opponentDeck,played_card,colorOfPlayedCard) => {
+        const modifiedDeck = [...drawCardPile]
+        const opponentDrawCard = modifiedDeck.pop()
+
+        const removeIndex = playerDeck.indexOf(played_card)
+        const updatedPlayerDeck = 
+            [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+        opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard, ...opponentDeck.slice(opponentDeck.length)]
+
+        socketEmitUpdateGameState(player,player,played_card,updatedPlayerDeck,
+                colorOfPlayedCard,currentNumber,modifiedDeck,opponentDeck)
+    }
+
+    const ifCard = (player,played_card,colorOfPlayedCard,opponent,isForgotUno=false) => {
+        if (currentNumber > 9 || currentNumber < 1) {
+            alert("Não é possivel jogar o IF em cartas especiais ou em um zero!");
+            return;
+        }
+        const nextTurn = player == 'Player 1' ? 'Player 2' : 'Player 1'
+
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
+        
+        let opponentDeck = opponent == 'Player 1' ? player1Deck : player2Deck
+        
+        // se o oponente tiver uma carta com numero igual a boardnumber,
+        // o oponente pode jogar o card
+        const regex = /^[0-9]/
+        const opponentHasCard = () => {
+            for (const i of opponentDeck) {
+                if(i.match(regex) == currentNumber){
+                    return true
+                }
+            }
+        }
+        if(opponentHasCard){
+            opponentHasCardIfCard(playerDeck,opponentDeck,played_card,colorOfPlayedCard)
+        }else{
+            alert("Opponent doesn't have a card with number " + currentNumber)
+
+            if(isForgotUno){
+                forgotUno(player, turn, played_card, colorOfPlayedCard, 200,null,null,true)
+            }else{
+                const modifiedDeck = [...drawCardPile]
+                console.log("começa o loop para o ifCard")
+                for (let index = 1; index <= currentNumber; index++) {                    
+                    const opponentDrawCard = modifiedDeck.pop()
+
+                    opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard, ...opponentDeck.slice(opponentDeck.length)]
+
+                    for (const i of opponentDeck) {
+                        if(i.match(regex) == currentNumber){
+                            opponentHasCardIfCard(playerDeck,opponentDeck,played_card,colorOfPlayedCard)
+                        }
+                    }
+                }
+                const removeIndex = playerDeck.indexOf(played_card);
+                const updatedPlayerDeck = 
+                    [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+
+                socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,
+                    colorOfPlayedCard,200,modifiedDeck,opponentDeck)
+            }
         }
     }
 
