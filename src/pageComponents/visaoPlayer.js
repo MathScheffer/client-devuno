@@ -386,6 +386,41 @@ const VisaoPlayer = ({
         }
     }
 
+    const Forcard = (player,played_card, opponentDeck, modifiedDeck, nextTurn, colorOfPlayedCard, isForgotUno=false) => { 
+
+        const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
+    
+            if(isForgotUno){
+                forgotUno(player,turn,played_card,300)
+            }else{
+                const removeIndex = playerDeck.indexOf(played_card);
+                const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+    
+                !isSoundMuted && playWildCardSound()
+                socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
+                    300)
+            }         
+            
+        
+        console.log(currentNumber)
+    
+        if (currentNumber > 9 || currentNumber < 1) {
+            alert("Não é possivel jogar o FOR em cartas especiais ou em um zero!");
+            return;}else {
+                for (let index = 1; index <= currentNumber; index++) {                    
+                    const opponentDrawCard = modifiedDeck.pop()
+    
+                    opponentDeck = [...opponentDeck.slice(0, opponentDeck.length), opponentDrawCard, ...opponentDeck.slice(opponentDeck.length)]
+                }
+                const removeIndex = playerDeck.indexOf(played_card);
+                const updatedPlayerDeck = 
+                    [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
+    
+                socketEmitUpdateGameState(player,nextTurn,played_card,updatedPlayerDeck,
+                    colorOfPlayedCard,103,modifiedDeck,opponentDeck)
+            }
+        }
+
     const drag2 = (player,played_card,colorOfPlayedCard,opponent,isForgotUno=false) => {
         const nextTurn = player == 'Player 1' ? 'Player 2' : 'Player 1'
 
