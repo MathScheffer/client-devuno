@@ -123,6 +123,13 @@ a {
   border: 2px solid #fff;
 }
 
+.GameWaitingRoom {
+  background-color: #000;
+  width: 100%;
+  height: 100%;
+  background-size: 100%;
+}
+
 .player1Deck{
   overflow: hidden;
 }
@@ -144,22 +151,21 @@ a {
   flex-direction: row;
   justify-content: space-between;
   padding: 0 60px;
-  height: 100px;
+}
 
+.topInfoImg {
+ height: 100px;
+}
+
+.messagesForWaitingRoom{
+  display: block;
+  width: 100%;;
 }
 
 
 
-.topInfo>h1 {
-  margin-top: 10px;
-  font-size: 1.8rem;
-  padding-top: 2%;
-}
 
-.topInfoText {
-  font-size: 2rem;
-  margin: 0;
-}
+
 
 /* Player Decks */
 .player1Deck {
@@ -446,7 +452,7 @@ a {
 .chat-head{
 	width: inherit;
 	height: 45px;
-	background: #2c3e50;
+	background: #000;
 	border-radius: 5px 5px 0px 0px;
 }
 .chat-head h2{
