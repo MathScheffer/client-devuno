@@ -658,7 +658,7 @@ const Game = (props) => {
             {(!roomFull) ? <>
 
                 <div className='topInfo'>
-                    <img src={devunoWhite} />
+                    <img className='topInfoImg' src={devunoWhite} />
                     <h1>Game Code: {room}</h1>
                     <span>
                         <button className='game-button-sound' onClick={() => setSoundMuted(!isSoundMuted)}>{isSoundMuted ? <span className="material-icons">volume_off</span> : <span className="material-icons">volume_up</span>}</button>

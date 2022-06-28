@@ -747,7 +747,7 @@ const VisaoPlayer = ({
                 }
 
                 {turn == 'Player 2' &&
-                    <button className='game-button orange' disabled={player2Deck.length !== 2} onClick={() => {
+                    <button className='button-uno' disabled={player2Deck.length !== 2} onClick={() => {
                         setUnoButtonPressed(!isUnoButtonPressed)
                         playUnoSound()
                     }}>UNO</button>
