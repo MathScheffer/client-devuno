@@ -580,16 +580,19 @@ const VisaoPlayer = ({
         let cardWithoutColor = playedCardsPile[playedCardsPile.length - 1]
         cardWithoutColor = cardWithoutColor.split('_')[0]
 
+        console.log(`cardWithoutColor: ${cardWithoutColor}`)
         let jokerCardTransform = ''
         let nextNumber = '';
 
         if(cardWithoutColor == 'BREAK' || cardWithoutColor == 'PASS' ||
-           cardWithoutColor == 'W'     || cardWithoutColor == 'WHILE'|| 
-           cardWithoutColor == 'D4W'   || cardWithoutColor.includes('D2')) {
+           cardWithoutColor == 'W'     || cardWithoutColor == 'WHILE'||
+           cardWithoutColor == 'D4W'   || cardWithoutColor.includes('D2') ||
+           cardWithoutColor.includes('skip')) {
 
             jokerCardTransform = 'JOKER_' + currentColor
             nextNumber = 700
-
+            console.log(`nextNumber: ${nextNumber}`)
+            console.log(`passou do break`)
         }else if(cardWithoutColor[0] >= 0 && cardWithoutColor[0] <= 9){
 
             jokerCardTransform = `JOKER_${currentNumber}_${currentColor}`
@@ -602,7 +605,7 @@ const VisaoPlayer = ({
         console.log(`nextNumber: ${nextNumber}`)
 
         if(updatedDrawCardPile){
-            socketEmitUpdateGameState(player,nextNumber,jokerCardTransform,playerDeck,currentColor,nextNumber,updatedDrawCardPile,null,false)
+            socketEmitUpdateGameState(player,nextTurn,jokerCardTransform,playerDeck,currentColor,nextNumber,updatedDrawCardPile,null,false)
 
         }else if(playerDeck.length===2 && !isUnoButtonPressed && nextNumber != '' && jokerCardTransform != ''){
 
@@ -611,7 +614,7 @@ const VisaoPlayer = ({
             const removeIndex = playerDeck.indexOf('JOKER_W')
             const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex + 1)]
 
-            socketEmitUpdateGameState(player, turn, jokerCardTransform, updatedPlayerDeck,currentColor,nextNumber,null,null,false)
+            socketEmitUpdateGameState(player, nextTurn, jokerCardTransform, updatedPlayerDeck,currentColor,nextNumber,null,null,false)
         }else{
             alert('Invalid move!')
         }
