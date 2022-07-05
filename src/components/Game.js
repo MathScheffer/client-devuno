@@ -28,6 +28,7 @@ import { waitFor } from '@testing-library/react'
 //BREAK - 101
 //PASS - 102
 //JOKER - 700
+//IF - 200
 
 let socket
 // const ENDPOINT = 'http://localhost:5000'
@@ -122,6 +123,8 @@ const Game = (props) => {
             shuffledCards[startingCardIndex]==='BREAK_B'  || shuffledCards[startingCardIndex]==='BREAK_Y' ||
             shuffledCards[startingCardIndex]==='PASS_R'   || shuffledCards[startingCardIndex]==='PASS_G'  || 
             shuffledCards[startingCardIndex]==='PASS_B'   || shuffledCards[startingCardIndex]==='PASS_Y'  ||
+            shuffledCards[startingCardIndex]==='IF_R'     || shuffledCards[startingCardIndex]==='IF_G'    ||
+            shuffledCards[startingCardIndex]==='IF_B'     || shuffledCards[startingCardIndex]==='IF_Y'    ||
             shuffledCards[startingCardIndex]==='JOKER_W'
             
             ) {
