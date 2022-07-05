@@ -165,16 +165,12 @@ const Game = (props) => {
             setDrawCardPile(drawCardPile)
             setLastNumber(lastNumber)
             setIsWhileCardOnPile(isWhileCardOnPile)
-  /*           setWhileCardConf(whileCardConf)
-            
-            console.log("Current number conf init: ",currentNumber)
-            console.log("While card conf init: ",whileCardConf) */
+
         })
 
         socket.on('updateGameState', ({ gameOver, winner, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber, isWhileCardOnPile = false}) => {
             console.log("drawnCardPile: ",drawCardPile)
             const booleanWhieldCard = isWhileCardOnPile !== undefined ? isWhileCardOnPile : false
-//            const verifiedLastNumber = lastNumber !== undefined ? lastNumber : 
 
             gameOver && setGameOver(gameOver)
             gameOver===true && playGameOverSound()
@@ -186,10 +182,8 @@ const Game = (props) => {
             currentNumber && setCurrentNumber(currentNumber)
             playedCardsPile && setPlayedCardsPile(playedCardsPile)
             drawCardPile && setDrawCardPile(drawCardPile)
-           // whileCardConf && setWhileCardConf(whileCardConf)
             lastNumber && setLastNumber(lastNumber)
             isWhileCardOnPile && setIsWhileCardOnPile(isWhileCardOnPile)
-            //console.log("While card conf update: ",whileCardConf)
             console.log("Current number update: ",currentNumber)
             console.log("Last number conf update: ",lastNumber)
             console.log('isWhileCardOnPile update: ', isWhileCardOnPile)
