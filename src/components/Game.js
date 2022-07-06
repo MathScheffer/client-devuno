@@ -28,6 +28,8 @@ import { waitFor } from '@testing-library/react'
 //BREAK - 101
 //PASS - 102
 //JOKER - 700
+//IF - 200
+// FOR - 300
 
 let socket
 // const ENDPOINT = 'http://localhost:5000'
@@ -122,6 +124,8 @@ const Game = (props) => {
             shuffledCards[startingCardIndex]==='BREAK_B'  || shuffledCards[startingCardIndex]==='BREAK_Y' ||
             shuffledCards[startingCardIndex]==='PASS_R'   || shuffledCards[startingCardIndex]==='PASS_G'  || 
             shuffledCards[startingCardIndex]==='PASS_B'   || shuffledCards[startingCardIndex]==='PASS_Y'  ||
+            shuffledCards[startingCardIndex]==='IF_R'     || shuffledCards[startingCardIndex]==='IF_G'    ||
+            shuffledCards[startingCardIndex]==='IF_B'     || shuffledCards[startingCardIndex]==='IF_Y'    ||
             shuffledCards[startingCardIndex]==='JOKER_W'
             
             ) {
@@ -165,16 +169,12 @@ const Game = (props) => {
             setDrawCardPile(drawCardPile)
             setLastNumber(lastNumber)
             setIsWhileCardOnPile(isWhileCardOnPile)
-  /*           setWhileCardConf(whileCardConf)
-            
-            console.log("Current number conf init: ",currentNumber)
-            console.log("While card conf init: ",whileCardConf) */
+
         })
 
         socket.on('updateGameState', ({ gameOver, winner, turn, player1Deck, player2Deck, currentColor, currentNumber, playedCardsPile, drawCardPile, lastNumber, isWhileCardOnPile = false}) => {
             console.log("drawnCardPile: ",drawCardPile)
             const booleanWhieldCard = isWhileCardOnPile !== undefined ? isWhileCardOnPile : false
-//            const verifiedLastNumber = lastNumber !== undefined ? lastNumber : 
 
             gameOver && setGameOver(gameOver)
             gameOver===true && playGameOverSound()
@@ -186,10 +186,8 @@ const Game = (props) => {
             currentNumber && setCurrentNumber(currentNumber)
             playedCardsPile && setPlayedCardsPile(playedCardsPile)
             drawCardPile && setDrawCardPile(drawCardPile)
-           // whileCardConf && setWhileCardConf(whileCardConf)
             lastNumber && setLastNumber(lastNumber)
             isWhileCardOnPile && setIsWhileCardOnPile(isWhileCardOnPile)
-            //console.log("While card conf update: ",whileCardConf)
             console.log("Current number update: ",currentNumber)
             console.log("Last number conf update: ",lastNumber)
             console.log('isWhileCardOnPile update: ', isWhileCardOnPile)
@@ -217,7 +215,7 @@ const Game = (props) => {
             {(!roomFull) ? <>
 
                 <div className='topInfo'>
-                    <img src={devunoWhite} />
+                    <img className='topInfoImg' src={devunoWhite} />
                     <h1>Game Code: {room}</h1>
                     <span>
                         <button className='game-button-sound' onClick={() => setSoundMuted(!isSoundMuted)}>{isSoundMuted ? <span className="material-icons">volume_off</span> : <span className="material-icons">volume_up</span>}</button>
