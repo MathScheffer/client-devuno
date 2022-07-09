@@ -353,10 +353,11 @@ const VisaoPlayer = ({
                 break;
             }
             case 'IF_R': case 'IF_G': case 'IF_B': case 'IF_Y':{
+                const colorOfPlayedCard = played_card.charAt(played_card.length - 1);
                 if(cardPlayedBy === 'Player 1'){
-                    ifCard('Player 1',turn,played_card)
+                    ifCard('Player 1',played_card,colorOfPlayedCard)
                 }else{
-                    ifCard('Player 2',turn,played_card)
+                    ifCard('Player 2',played_card,colorOfPlayedCard)
                 }
                 break;
             }
@@ -642,7 +643,7 @@ const VisaoPlayer = ({
         if(cardWithoutColor == 'BREAK' || cardWithoutColor == 'PASS' ||
            cardWithoutColor == 'W'     || cardWithoutColor == 'WHILE'||
            cardWithoutColor == 'D4W'   || cardWithoutColor.includes('D2') ||
-           cardWithoutColor.includes('skip')) {
+           cardWithoutColor.includes('skip') || cardWithoutColor.includes('IF')) {
 
             jokerCardTransform = 'JOKER_' + currentColor
             nextNumber = 700
