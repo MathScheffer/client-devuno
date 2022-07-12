@@ -531,3 +531,16 @@ a {
 	opacity: .9;
 }
 
+.button-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.button-close{
+  padding: 8px;
+  background-color: #000;
+  color: #fff;
+  border-radius: 6px;
+  margin-top: 20px;
+}
