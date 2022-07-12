@@ -38,10 +38,13 @@ a {
   align-items: center;
   justify-content: center;
   font-size: 18px;
+  color: #fff; 
+  font-weight: 500;
 }
 
 #input-code::placeholder{
   color: #fff; 
+  padding: 15%; 
 }
 
 
@@ -66,20 +69,73 @@ a {
 
 /* Game.js Background */
 .backgroundColorR {
-  background-color:#8B0000;
+  background-color: #BE3D2B;
+  width: 100%;
+  height: 100%;
 }
 
 .backgroundColorG {
-  background-color: #6B8E23;
+  background-color: #99BD4C;
+  width: 100%;
+  height: 100%;
 }
 
 .backgroundColorB {
-  background-color: #4682B4;
+  background-color:  #4274B8;
+  width: 100%;
+  height: 100%;
 }
 
 .backgroundColorY {
+  width: 100%;
+  height: 100%;
+  background-color:	#F4D348;
+}
 
-  background-color:	#FFD700;
+.middleInfo{
+  background-color: #000;
+  width: 100%;
+  height: 220px;
+}
+
+.middleInfo .Card{
+  width: 10%;
+}
+
+.button-baralho{ 
+  background-color: #ea323c;
+  font-weight: 700;
+  padding: 1%; 
+  font-size: 20px;
+  color: #FFC825;
+  -webkit-text-stroke: 1px #000;
+  border: 2px solid #fff;
+}
+
+.button-uno {
+  background-color: #ea323c;
+  border-radius: 100%;
+  color: #FFC825;
+  font-size: 20px;
+  padding: 1%;
+  font-weight: bold;
+  -webkit-text-stroke: 1px #000;
+  border: 2px solid #fff;
+}
+
+.GameWaitingRoom {
+  background-color: #000;
+  width: 100%;
+  height: 100%;
+  background-size: 100%;
+}
+
+.player1Deck{
+  overflow: hidden;
+}
+
+.player2Deck {
+  overflow: hidden;
 }
 
 /* UNO Cards */
@@ -95,22 +151,21 @@ a {
   flex-direction: row;
   justify-content: space-between;
   padding: 0 60px;
-  height: 100px;
+}
 
+.topInfoImg {
+ height: 100px;
+}
+
+.messagesForWaitingRoom{
+  display: block;
+  width: 100%;;
 }
 
 
 
-.topInfo>h1 {
-  margin-top: 10px;
-  font-size: 1.8rem;
-  padding-top: 2%;
-}
 
-.topInfoText {
-  font-size: 2rem;
-  margin: 0;
-}
+
 
 /* Player Decks */
 .player1Deck {
@@ -397,7 +452,7 @@ a {
 .chat-head{
 	width: inherit;
 	height: 45px;
-	background: #2c3e50;
+	background: #000;
 	border-radius: 5px 5px 0px 0px;
 }
 .chat-head h2{
@@ -476,3 +531,16 @@ a {
 	opacity: .9;
 }
 
+.button-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.button-close{
+  padding: 8px;
+  background-color: #000;
+  color: #fff;
+  border-radius: 6px;
+  margin-top: 20px;
+}
