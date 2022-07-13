@@ -396,7 +396,7 @@ const VisaoPlayer = ({
                     drag4('Player 1', played_card, 'Player 2', player1Deck.length === 2 && !isUnoButtonPressed)
                 }
                 else {
-                    drag4('Player 2', played_card, 'Player 1', player1Deck.length === 2 && !isUnoButtonPressed)
+                    drag4('Player 2', played_card, 'Player 1', player2Deck.length === 2 && !isUnoButtonPressed)
                 }
             }
                 break;
