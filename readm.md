@@ -5,7 +5,7 @@
 Tabela de conteúdos
 =================
 <!--ts-->
-   * [Descrição do projeto](#Descicao-do-Projeto)
+   * [O Projeto](#O-Projeto)
    * [Como instalar](#Como-instalar)
    * [Como iniciar um jogo](#Como-iniciar-um-jogo)
    * [Técnicas e tecnologias utilizadas](#Tecnicas-e-tecnologias-utilizadas)
@@ -13,7 +13,7 @@ Tabela de conteúdos
 <!--te-->
 
 
-## 🤔Descicao do Projeto
+## 🤔O Projeto
 
 
 O jogo __DEVUNO__ foi baseado em um jogo de UNO comum, porém, com funções que são utilizados nas linguagens de programação. Até o momento, foram utilizadas as cartas: 
