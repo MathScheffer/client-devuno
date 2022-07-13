@@ -9,7 +9,7 @@ export default [
     'WHILE_R','WHILE_G','WHILE_B','WHILE_Y',
     'BREAK_R','BREAK_R','BREAK_R','BREAK_G','BREAK_G','BREAK_G','BREAK_B','BREAK_B','BREAK_B','BREAK_Y','BREAK_Y','BREAK_Y',
     'PASS_R','PASS_R','PASS_G','PASS_G','PASS_B','PASS_B','PASS_Y','PASS_Y',
-    'JOKER_W','JOKER_W','JOKER_W','JOKER_W'
-    ,'JOKER_W','JOKER_W','JOKER_W','JOKER_W',
-    'IF_R','IF_R','IF_G','IF_G','IF_B','IF_B','IF_Y','IF_Y'
+    'JOKER_W','JOKER_W','JOKER_W','JOKER_W',
+    'JOKER_W','JOKER_W','JOKER_W','JOKER_W',
+    //'IF_R','IF_R','IF_G','IF_G','IF_B','IF_B','IF_Y','IF_Y'
 ]

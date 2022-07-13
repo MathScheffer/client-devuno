@@ -504,21 +504,29 @@ const VisaoPlayer = ({
         }
     }
 
+    const printTurn = () => {
+        console.log(turn)
+    }
     const wildCard = (player,turn,played_card,isForgotUno=false) => {
        let newColor = prompt('Enter first letter of new color (R/G/B/Y)')
        if(newColor){
         newColor = newColor.toUpperCase()
         const playerDeck = player == 'Player 1' ? player1Deck : player2Deck
-
             if(isForgotUno){
+                console.table(player,turn,played_card, newColor)
                 forgotUno(player,turn,played_card,newColor,300)
             }else{
                 const removeIndex = playerDeck.indexOf(played_card);
                 const updatedPlayerDeck = [...playerDeck.slice(0,removeIndex), ...playerDeck.slice(removeIndex+1)]
 
                 !isSoundMuted && playWildCardSound()
+
+                console.table(player,turn,played_card,updatedPlayerDeck,
+                    newColor,300)
                 socketEmitUpdateGameState(player,turn,played_card,updatedPlayerDeck,
                     newColor,300)
+                
+                console.log(printTurn())
             }
         }else{
             alert("Invalid Color!")
