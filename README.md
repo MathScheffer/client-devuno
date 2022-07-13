@@ -8,6 +8,7 @@ Tabela de conteúdos
    * [O Projeto](#O-Projeto)
    * [Como instalar](#Como-instalar)
    * [Como iniciar um jogo](#Como-iniciar-um-jogo)
+   *  [Manual e Regras](#Manual-e-Regras)
    * [Técnicas e tecnologias utilizadas](#Tecnicas-e-tecnologias-utilizadas)
    * [Criadores](#criadores)
 <!--te-->
@@ -17,7 +18,7 @@ Tabela de conteúdos
 
 
 O jogo __DEVUNO__ foi baseado em um jogo de UNO comum, porém, com funções que são utilizados nas linguagens de programação. Até o momento, foram utilizadas as cartas: 
-  * JOKER
+  * JOKER (function(joker))
   * WHILE
   * FOR
   * BREAK
@@ -50,6 +51,9 @@ Este comando vai fazer com que o client rode o programa no localhost port 3000.
 2. Para hospedar um novo jogo, clique em CRIAR JOGO. Um código de jogo será gerado e você poderá compartilhar com seu amigo.
 3. Para entrar no jogo de um amigo, digite o código do jogo fornecido por ele e clique em JOIN GAME.
 4. É isso! Aproveite o jogo e lembre-se, sem toxicidade!
+
+## ⚠️ Manual e Regras
+Leia o manual e as regras completas [aqui](https://docs.google.com/document/d/1gK72I9fOa4ci_TH4wz0O7NCQjBYLUiGhfzxzGpZNhPg/edit?usp=sharing).
 
 
 ## Tecnicas e tecnologias utilizadas
